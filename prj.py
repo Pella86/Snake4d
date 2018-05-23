@@ -129,6 +129,13 @@ class Cam4:
         
         return vec.V3(x,y,z)
 
+    def change_target(self, t):
+        self.To = t
+        self.t_matrix = self.trans_matrix()
+    
+    def change_position(self, p):
+        self.From = p
+        self.t_matrix = self.trans_matrix()
 
 if __name__ == "__main__":
     

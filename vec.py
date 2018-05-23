@@ -7,8 +7,6 @@ Created on Wed May 16 22:37:10 2018
 
 # Vector utility for 2, 3, 4 dimensions
 
-# TODO: change behavior of the __add__, __sub__, __mul__
-
 import math
 
 class VecExcept(Exception):

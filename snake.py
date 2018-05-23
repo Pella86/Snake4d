@@ -20,33 +20,40 @@ class Snake:
             next_cube_center = self.head_pos - vec.V4(self.size - cube, 0, 0 , 0)
             next_cube = self.create_cube(next_cube_center)
             self.p_list.append(next_cube)
-    
-    def create_cube(self, point):
-        return poly.create_cube4d(point, 1., "green")
-    
-    def move(self, new_dir):
+        
+        # generate the directions vectors and forbbidden directions
         possible_dirs = ["UP", "DOWN", "LEFT", "RIGHT", "FW", "RW", "IN", "OUT"]
         
-        dir_v = {}
-        opposite_dir = {}
+        self.dir_v = {}
+        self.opposite_dir = {}
         for i, direction in enumerate(possible_dirs):
             # generate direction vectors
             v = [0, 0, 0, 0]
             v[int(i / 2)] = 1 if i % 2 == 0 else -1
-            dir_v[direction] = vec.V4(v)
+            self.dir_v[direction] = vec.V4(v)
             
-            # generate direction vectors
-            opposite_dir[direction] = possible_dirs[i + (1 if i % 2 == 0 else -1)]
-        
-        if new_dir != opposite_dir[self.head_dir]:
-            # move the snake head
-            self.head_pos = self.head_pos + dir_v[new_dir]
+            # generate forbidden directions
+            self.opposite_dir[direction] = possible_dirs[i + (1 if i % 2 == 0 else -1)]        
+    
+    def create_cube(self, point):
+        return poly.create_cube4d(point, 1., "green")
+    
+    def change_dir(self, new_dir):
+        if new_dir != self.opposite_dir[self.head_dir]:
             self.head_dir = new_dir
-            
-            # move the snake body by popping the last element and adding a
-            # segment in the head 
-            self.p_list.pop(0)
-            self.p_list.append(self.create_cube(self.head_pos))
+            return True
+        else:
+            print("WRONG DIRECTION", new_dir)
+            return False
+    
+    def move(self):
+        # move the snake head
+        self.head_pos = self.head_pos + self.dir_v[self.head_dir]
+        
+        # move the snake body by popping the last element and adding a
+        # segment in the head 
+        self.p_list.pop(0)
+        self.p_list.append(self.create_cube(self.head_pos))
     
     def add_segment(self):
         # copy the last block

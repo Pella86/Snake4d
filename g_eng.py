@@ -7,6 +7,7 @@ Created on Tue May 22 22:15:01 2018
 
 import snake, poly, vec
 import random
+import copy
 
 class GameEngine:
     
@@ -45,7 +46,7 @@ class GameEngine:
         def generate_rand_point():
             coords = []
             for i in range(4):
-                coords.append(random.randrange(-self.bbox_size, self.bbox_size))
+                coords.append(random.randrange(-self.bbox_size + 1, self.bbox_size - 1))
             return vec.V4(coords)
         
         redo = True
@@ -74,18 +75,24 @@ class GameEngine:
                 return False
         return True
     
-    def check_collision(self, snake_dir):
-        self.snake.move(snake_dir)
+    def check_collision(self):
+        self.snake.move()
         
-        if not self.intersect(self.snake.head_pos, self.bbox):
+        ext_bbox = copy.deepcopy(self.bbox)
+        ext_bbox.v_list[0] = self.bbox.v_list[0] - vec.V4(1,1,1,1)
+        ext_bbox.v_list[1] = self.bbox.v_list[1] + vec.V4(1,1,1,1)
+        
+        if not self.intersect(self.snake.head_pos, ext_bbox):
             return "out_bbox"
         
         if self.intersect(self.snake.head_pos, self.food):
             return "food"
         
-        for p in self.snake.p_list:
+        for p in self.snake.p_list[:-1]:
             if self.intersect(self.snake.head_pos, p):
                 return "snake"
+        
+        return "none"
     
     def evaluate_collision(self, collision):
         
@@ -98,7 +105,8 @@ class GameEngine:
             self.score += 1
         
     def routine(self):
-        c = self.check_collision(self.snake.head_dir)
+        c = self.check_collision()
+        print(c)
         self.evaluate_collision(c)
         self.generate_plist()
         

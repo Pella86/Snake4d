@@ -7,8 +7,6 @@ Created on Fri May 18 20:44:22 2018
 
 import mat, vec, math
 
-
-
 #t = math.pi
 #mxy = [ [  math.cos(t), math.sin(t), 0, 0],
 #        [ -math.sin(t), math.cos(t), 0, 0],
