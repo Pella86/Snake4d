@@ -9,6 +9,9 @@ Created on Wed May 16 22:37:10 2018
 
 import math
 
+# is close constant
+epsilon = 0.00000001
+
 class VecExcept(Exception):
     pass
 
@@ -106,6 +109,20 @@ class Vector:
             if self.coords[i] != v2[i]:
                 return False
         return True
+
+    def is_close(self, v2):
+        self.check_dimensions(v2)
+        
+#        if abs(self.dot(v2)) > epsilon:
+#            return False
+#        for i in range(self.dimension):
+#            if self.coords[i] - v2[i] > epsilon:
+#                return False
+
+        for i in range(self.dimension):
+            if abs(self.coords[i] - v2[i]) > epsilon:
+                return False
+        return True        
         
     def __str__(self):
         s = "("

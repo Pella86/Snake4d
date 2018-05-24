@@ -27,6 +27,7 @@ class GameEngine:
         self.score = 0
         
         self.p_list = []
+        
         self.generate_plist()
     
     def generate_plist(self):
@@ -60,7 +61,7 @@ class GameEngine:
                     redo = True
                     break   
         print("new food at", food_point)
-        return poly.create_cube4d(food_point, 1, "blue")
+        return poly.create_cube4d(food_point, 0.9, "blue")
     
     
     def intersect(self, point, polygon):
@@ -106,7 +107,6 @@ class GameEngine:
         
     def routine(self):
         c = self.check_collision()
-        print(c)
         self.evaluate_collision(c)
         self.generate_plist()
         
