@@ -8,17 +8,22 @@ Created on Thu May 17 13:20:44 2018
 
 from tkinter import Tk, _tkinter, StringVar, Label, Menu, Toplevel
 
-import visu, g_eng
+import visu, g_eng, score
 import time
+import datetime
 
 # add new game button
 # add help button
 # add high score panel
+# add text for the beginning and end
+#   - Press space to start if game is game_over
+#   - Press p or any key to pause/continue if game is running
+# add rotations
 
 
 info_text =  "*****************snake 4d********************\n"
 info_text += "Rules:                                 \n"
-info_text += "    1. eat the food (red cube)         \n"
+info_text += "    1. eat the food (blue cube)        \n"
 info_text += "    2. don't hit the walls (black)     \n"
 info_text += "    3. don't cross yourself (green)    \n"
 info_text += "                                       \n"
@@ -42,9 +47,6 @@ info_text += "  X or C to control 3d rotations       \n"
 info_text += "  B or N or M to control 4d rotations  \n"
 info_text += "**********************************************\n"
 
-class Score:
-    def __init__(self):
-        pass
 
 class KeyBuffer:
     
@@ -65,8 +67,10 @@ class KeyBuffer:
         if self.buf:
             return self.key_to_dir[self.buf.pop(0)]
         else:
-            return None
+            return None 
     
+    def clear(self):
+        self.buf = []
 
 class MainApp:
     
@@ -118,6 +122,10 @@ class MainApp:
         self.paused = True
         self.root.bind("p", self.toggle_pause)
         self.root.bind("<space>", self.new_game)
+        
+        self.areas[0].add_text("Press any key to play")
+        
+        self.score_board = score.ScoreBoard(self.root)
     
     def help_cmd(self):
         tl = Toplevel(self.root)
@@ -126,9 +134,18 @@ class MainApp:
         
     def new_game(self, event):
         self.game = g_eng.GameEngine()
+        self.areas[0].clear_text()
+        self.areas[0].add_text("Press any key to play")
+        self.key_buffer.clear()
     
     def toggle_pause(self, event):
-        self.paused = False if self.paused == True else True
+        if self.game.state != "game_over":
+            self.paused = False if self.paused == True else True
+        
+        if self.paused and self.game.state != "game_over":
+            self.areas[0].add_text("Press P to continue")
+        elif self.game.state != "game_over":
+            self.areas[0].clear_text()
             
     def move(self, event):
         pressed_key = event.char
@@ -162,7 +179,8 @@ class MainApp:
                 
                 if self.paused or self.game.state == "game_over":
                     pass
-                else:              
+                else:
+                    self.areas[0].clear_text()
                     next_dir = self.key_buffer.get_key()
                     
                     if next_dir:
@@ -172,6 +190,15 @@ class MainApp:
                     self.score_str.set("Score: " + str(self.game.score))
                     
                     if self.game.state == "game_over":
+                        self.areas[0].add_text("Game Over\nPress space for new game")
+                        
+                        # create new score
+                        curr_score = score.Score(datetime.datetime.now(), self.game.score)
+                        
+                        self.score_board.add_score(curr_score)
+                        
+                        self.score_board.render_scores()
+                        
                         self.paused = True
             
             if time.time() - update_time > update_rate:
@@ -185,12 +212,15 @@ def main():
     print("Snake 4D revised")
 
     root = Tk()
+    root.title("Snake 4d (2.0)")
     ma = MainApp(root)
     
     try:
         ma.updater()
-    except _tkinter.TclError:
-        pass
+    except _tkinter.TclError as e:
+        print(e.__class__)
+        print(e)
+        
     except Exception as e:
         print(e.__class__)
         print(e)
@@ -199,7 +229,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
     
     
     

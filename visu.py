@@ -87,6 +87,17 @@ class VisuArea:
         
         self.drawn_edges = DrawnEdges()
         
+        self.text_items = []
+    
+    def add_text(self, text):
+        item_n = self.canvas.create_text([self.cw / 2., self.ch / 2.], text=text, font=("Fixedsys", 26), fill="lightgreen", justify="center")
+        self.text_items.append(item_n)
+        
+    
+    def clear_text(self):
+        for i in self.text_items:
+            self.canvas.delete(i)
+        
     def convert_to_canvas_coord(self, x, y):
         h = self.ch - (self.ch / self.area_h) * y - self.c_center_h
         w = (self.cw / self.area_w) * x + self.c_center_w
