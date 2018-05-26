@@ -5,8 +5,9 @@ Created on Wed May 23 15:33:29 2018
 @author: Mauro
 """
 from tkinter import Frame, Canvas, Label
-import vec, prj, poly
+import vec, prj, poly, qua, rot4
 import copy
+import math
 
 # The drawing functions are the ones taking more time
 # One way to reduce the drawing burden is to reduce the drawed objects
@@ -190,6 +191,54 @@ class ProjectCam:
             p2 = self.cam3.prj(p3)
             polygon.v_list[i] = p2
         return polygon
+    
+    def rotate3(self, angles):
+        # angles = [angle, angle, angle]
+        if angles[0] != 0:
+            angle = math.radians(angles[0])
+            axis = vec.V3(1, 0, 0)
+            v = qua.rot_around_axis(self.cam3.From, axis, angle)
+            self.cam3.change_position(v)
+        
+        if angles[1] != 0:
+            angle = math.radians(angles[1])
+            axis = vec.V3(0, 1, 0)
+            v = qua.rot_around_axis(self.cam3.From, axis, angle)
+            self.cam3.change_position(v)        
+        
+        if angles[2] != 0:
+            angle = math.radians(angles[2])
+            axis = vec.V3(0, 0, 1)
+            v = qua.rot_around_axis(self.cam3.From, axis, angle)
+            self.cam3.change_position(v)
+
+    def rotate4(self, angles):
+
+        if angles[0] != 0:
+            angle = math.radians(angles[0])
+            rotv = rot4.rot_alpha(self.cam4.From, angle)
+
+        if angles[1] != 0:
+            angle = math.radians(angles[1])
+            rotv = rot4.rot_beta(self.cam4.From, angle)
+        
+        if angles[2] != 0:
+            angle = math.radians(angles[2])
+            rotv = rot4.rot_gamma(self.cam4.From, angle)
+        
+        if angles[3] != 0:
+            angle = math.radians(angles[3])
+            rotv = rot4.rot_delta(self.cam4.From, angle)
+        
+        if angles[4] != 0:
+            angle = math.radians(angles[4])
+            rotv = rot4.rot_rho(self.cam4.From, angle)
+        
+        if angles[5] != 0:
+            angle = math.radians(angles[5])
+            rotv = rot4.rot_epsilon(self.cam4.From, angle)
+
+        self.cam4.change_position(rotv)
 
 class ProjectFlat:
     

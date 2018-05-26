@@ -6,7 +6,7 @@ Created on Fri May 25 22:01:56 2018
 """
 import datetime
 import os
-from tkinter import Frame, Label, StringVar, Toplevel
+from tkinter import Label, Toplevel
 
 class Score:
     def __init__(self, date, score = None):
@@ -44,8 +44,7 @@ class Scores:
             s = Score(line)
             self.scores.append(s)
         
-        for score in self.scores:
-            print(score)
+        print("Loaded", len(self.scores), "scores")
         
     def add_score(self, score):
         self.new_scores.append(score)
@@ -82,9 +81,7 @@ class ScoreBoard:
         
     def render_scores(self):
         board = Toplevel(self.parent)
-        
-        
-        
+
         # title lable 
         titlel = Label(board, text = "---- HIGH SCORE ----", font=("Arial", 20))
         titlel.grid(row = 0, column = 0)
@@ -111,8 +108,6 @@ class ScoreBoard:
                 idx += 1
             else:
                 label_list[idx].append(score)
-                
-        print(label_list)
 
         # score list
         # take highest score
@@ -146,26 +141,5 @@ class ScoreBoard:
             
             
         
-        # scroll the top ten list
-        # if last score == one of the scores
-        # append to score table labels
-        # append the [string]
-        # continue in a new new_score label
-        
-
-#        s = ""
-#        for score in top_ten:
-#            # construct the format
-#            format_score = "{: >" +  str(cwidth_score) + "}"
-#            # print the formatted score
-#            fscore = format_score.format(score.score)
-#            # assemble the formatted string with date and score
-#            s += score.date.strftime("%d %b %y") + " - " + fscore + "\n"
-#        
-#        
-#        ltop_board = Label(board, text=s, font=("Fixedsys", 14), fg = "green" )
-#        ltop_board.pack()
-        
-        # graph sort by date, take last 30 time points
-        # plot xy in a 2d polygon, render it 
+  
         

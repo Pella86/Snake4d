@@ -117,6 +117,16 @@ class MainApp:
         for key in bind_key:
             self.root.bind(key, self.move)
         
+        rot3_keys_str = "xyc"
+        rot3_keys = list(rot3_keys_str) + list(rot3_keys_str.upper())
+        for key in rot3_keys:
+            self.root.bind(key, self.rot3)
+        
+        rot4_keys_str = "vbnmtz"
+        rot4_keys = list(rot4_keys_str) + list(rot4_keys_str.upper())
+        for key in rot4_keys:
+            self.root.bind(key, self.rot4)        
+        
         self.key_buffer = KeyBuffer()
         
         self.paused = True
@@ -126,6 +136,35 @@ class MainApp:
         self.areas[0].add_text("Press any key to play")
         
         self.score_board = score.ScoreBoard(self.root)
+    
+    def rot4(self, event):
+        self.areas[0].clear_text()
+        rot_keys = "vbnmtz"
+        rot_keys = rot_keys + rot_keys.upper()
+        
+        rotk_to_angle = {}
+        
+        for i, k in enumerate(rot_keys):
+            possible_rots = [0 for i in range(6)]
+            possible_rots[i % 6] = 5 if i < 6 else -5 
+            rotk_to_angle[k] = possible_rots
+        
+        self.areas[0].project_method.rotate4(rotk_to_angle[event.char])
+    
+    def rot3(self, event):
+        self.areas[0].clear_text()
+        rot_keys = "xyc"
+        rot_keys += rot_keys.upper()
+        
+        rotk_to_angle = {}
+        
+        for i, k in enumerate(rot_keys):
+            possible_rots = [0 for i in range(3)]
+            possible_rots[i % 3] = 5 if i < 3 else -5
+            rotk_to_angle[k] = possible_rots
+        
+        r = rotk_to_angle[event.char]
+        self.areas[0].project_method.rotate3(r)
     
     def help_cmd(self):
         tl = Toplevel(self.root)
@@ -159,7 +198,7 @@ class MainApp:
             area.draw_plist(self.game.p_list)  
     
     def updater(self):
-        draw_rate = 1 / 10.0
+        draw_rate = 1 / 25
         game_rate = 1 / 2.0
         update_rate = 1 / 50.0
         

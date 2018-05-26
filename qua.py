@@ -71,6 +71,9 @@ class Q(vec.V4):
         z = a1 * d2 + b1 * c2 - c1 * b2 + d1 * a2
         
         return Q(w, x, y, z)
+    
+    def get_vector(self):
+        return vec.V3(self.x(), self.y(), self.z())
         
     
 def rot_around_axis(point, axis, angle):

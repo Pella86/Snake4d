@@ -25,6 +25,63 @@ import mat, vec, math
 #print(vrot)
 
 
+
+def rot_alpha(v, alpha):
+    mxy = [ [  math.cos(alpha), math.sin(alpha), 0, 0],
+            [ -math.sin(alpha), math.cos(alpha), 0, 0],
+            [            0,           0, 1, 0],
+            [            0,           0, 0, 1] ]    
+    
+    mxy = mat.SquareMatrix(mxy)
+    r = mxy *  mat.Matrix(v.coords)
+    return vec.V4(r[0,0], r[1,0], r[2,0], r[3,0])
+
+def rot_beta(v, beta):
+    myz = [ [ 1, 0, 0, 0],
+            [ 0, math.cos(beta), math.sin(beta), 0],
+            [ 0, -math.sin(beta), math.cos(beta), 0],
+            [ 0, 0, 0, 1] ]    
+    
+    myz = mat.SquareMatrix(myz)
+    r = myz *  mat.Matrix(v.coords)
+    return vec.V4(r[0,0], r[1,0], r[2,0], r[3,0])
+
+def rot_gamma(v, gamma):
+    mzx = [ [ math.cos(gamma), 0, -math.sin(gamma), 0],
+            [ 0, 1, 0, 0],
+            [ math.sin(gamma), 0, math.cos(gamma), 0],
+            [ 0, 0, 0, 1] ]    
+    mzx = mat.SquareMatrix(mzx)
+    r = mzx *  mat.Matrix(v.coords)
+    return vec.V4(r[0,0], r[1,0], r[2,0], r[3,0])
+
+def rot_delta(v, delta):
+    mxw = [ [ math.cos(delta), 0, 0, math.sin(delta)],
+            [ 0, 1, 0, 0],
+            [ 0, 0, 1, 0],
+            [ -math.sin(delta), 0, 0, math.cos(delta)] ]
+    mxw = mat.SquareMatrix(mxw)
+    r = mxw *  mat.Matrix(v.coords)
+    return vec.V4(r[0,0], r[1,0], r[2,0], r[3,0])
+
+def rot_rho(v, rho):
+    myw = [ [ 1, 0, 0, 0],
+            [ 0, math.cos(rho), 0, -math.sin(rho)],
+            [ 0, 0, 1, 0],
+            [ 0, math.sin(rho), 0, math.cos(rho)] ]      
+    myw = mat.SquareMatrix(myw)
+    r = myw *  mat.Matrix(v.coords)
+    return vec.V4(r[0,0], r[1,0], r[2,0], r[3,0])
+
+def rot_epsilon(v, epsilon):
+    mzw = [ [ 1, 0, 0, 0],
+            [ 0, 1, 0, 0],
+            [ 0, 0, math.cos(epsilon), -math.sin(epsilon)],
+            [ 0, 0, math.sin(epsilon), math.cos(epsilon)] ]    
+    mzw = mat.SquareMatrix(mzw)
+    r = mzw *  mat.Matrix(v.coords)
+    return vec.V4(r[0,0], r[1,0], r[2,0], r[3,0])
+
 def rot_v(v, alpha, beta, gamma, delta, rho, epsilon):
     
     # XY Plane rot matrix
