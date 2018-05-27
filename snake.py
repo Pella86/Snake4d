@@ -43,7 +43,6 @@ class Snake:
             self.head_dir = new_dir
             return True
         else:
-            print("WRONG DIRECTION", new_dir)
             return False
     
     def move(self):

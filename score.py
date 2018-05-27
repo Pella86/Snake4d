@@ -7,6 +7,7 @@ Created on Fri May 25 22:01:56 2018
 import datetime
 import os
 from tkinter import Label, Toplevel
+import visu, poly, vec
 
 class Score:
     def __init__(self, date, score = None):
@@ -63,10 +64,16 @@ class Scores:
         
         all_scores = sorted(all_scores, key=lambda x : x.score)
         all_scores = all_scores[::-1]
-        for score in all_scores:
-            print(score)
         
         return all_scores[:10]
+    
+    def get_last_scores(self):
+        all_scores = self.scores + self.new_scores
+        
+        all_scores = sorted(all_scores, key=lambda x : x.date)
+        all_scores = all_scores[::-1]
+        return all_scores[:20]
+        
 
 
 class ScoreBoard:
@@ -136,7 +143,43 @@ class ScoreBoard:
             ltop_board = Label(board, text=s, font=("Fixedsys", 14), fg = color,
                                borderwidth=2, relief=rel, padx=1, pady=1)
             
-            ltop_board.grid(row=(i + 1), column = 0,padx=0, pady=0)            
+            ltop_board.grid(row=(i + 1), column = 0, padx=0, pady=0) 
+#        in case needed is a graph of the scores        
+#        row = len(label_list) + 1
+#        
+#        graph = visu.VisuArea(board, None, [250, 100], "Score Evolution")
+#        graph.fP.grid(row=row, column = 0)
+#        
+#        graph.c_center_w = 0
+#        graph.c_center_h = 0
+#        
+#        p = poly.Polygon()
+#        
+#        score_list = self.scores.get_last_scores()
+#        score_list = score_list[::-1]
+#        
+#        point_list = []
+#        for i, score in enumerate(score_list):
+#            print(score.score)
+#            v = vec.V2(i, score.score)
+#            point_list.append(v)        
+#        
+#        p_max = max(point_list, key= lambda polygon : polygon.y())
+#        graph.area_h = p_max.y() + 2
+#        graph.area_w = len(score_list)
+#        
+#        e_list = []
+#        for i, p in enumerate(point_list[:-1]):
+#            e_list.append([i, i + 1])
+#        
+#        p.v_list = point_list
+#        p.e_list = e_list
+#        p.color = "red"
+#        
+#        graph.draw_poly(p)
+#        graph.draw_edge(vec.V2(0, graph.area_h), vec.V2(graph.area_w, graph.area_h), kwargs={"fill":"black"})
+#        graph.canvas.create_text(5, p_max.y(), text= str(p_max.y()), anchor= "w")
+            
             
             
             

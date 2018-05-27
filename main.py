@@ -248,7 +248,7 @@ class MainApp:
 
         
 def main():
-    print("Snake 4D revised")
+    print("Snake 4D (2.0)")
 
     root = Tk()
     root.title("Snake 4d (2.0)")
@@ -257,6 +257,7 @@ def main():
     try:
         ma.updater()
     except _tkinter.TclError as e:
+        print("Tkinter error: ", end="")
         print(e.__class__)
         print(e)
         

@@ -60,7 +60,6 @@ class GameEngine:
                 if self.intersect(food_point, p):
                     redo = True
                     break   
-        print("new food at", food_point)
         return poly.create_cube4d(food_point, 0.9, "blue")
     
     
