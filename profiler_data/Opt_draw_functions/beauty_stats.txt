@@ -1,0 +1,274 @@
+Sun May 27 22:28:01 2018    ./profiler_data/Opt_draw_functions\stats
+
+         88789169 function calls (87461071 primitive calls) in 43.331 seconds
+
+   Ordered by: cumulative time
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+      2/1    0.000    0.000   43.334   43.334 {built-in method builtins.exec}
+        1    0.000    0.000   43.331   43.331 main.py:343(main)
+        1    0.014    0.014   43.263   43.263 main.py:286(updater)
+      484    0.009    0.000   41.147    0.085 main.py:280(draw)
+     1452    0.049    0.000   41.033    0.028 visu.py:171(draw_plist)
+    11976    0.350    0.000   30.235    0.003 visu.py:122(draw_poly)
+   191616    5.185    0.000   29.643    0.000 visu.py:45(add_edge)
+ 17649679   20.773    0.000   27.200    0.000 vec.py:113(is_close)
+    11976    0.018    0.000   10.749    0.001 visu.py:167(project4)
+     3992    0.131    0.000    6.427    0.002 visu.py:186(project)
+     7984    0.996    0.000    4.304    0.001 visu.py:256(project)
+1137769/4049    1.279    0.000    3.130    0.001 copy.py:132(deepcopy)
+ 18360057    3.104    0.000    3.104    0.000 vec.py:45(check_dimensions)
+68833/4049    0.228    0.000    3.050    0.001 copy.py:268(_reconstruct)
+68833/4049    0.148    0.000    2.982    0.001 copy.py:236(_deepcopy_dict)
+72882/8098    0.227    0.000    2.922    0.000 copy.py:210(_deepcopy_list)
+ 21641692    2.667    0.000    2.667    0.000 vec.py:28(__getitem__)
+11260/11244    2.083    0.000    2.086    0.000 {method 'call' of '_tkinter.tkapp' objects}
+    63872    0.336    0.000    1.806    0.000 prj.py:142(prj)
+      484    0.001    0.000    1.429    0.003 __init__.py:1169(update)
+    63872    0.294    0.000    1.403    0.000 prj.py:67(prj)
+   447104    0.893    0.000    1.168    0.000 vec.py:64(dot)
+ 19191806    1.117    0.000    1.117    0.000 {built-in method builtins.abs}
+   131615    0.451    0.000    0.715    0.000 vec.py:84(__sub__)
+      485    0.001    0.000    0.591    0.001 __init__.py:1172(update_idletasks)
+   129568    0.177    0.000    0.569    0.000 copy.py:219(_deepcopy_tuple)
+   538716    0.390    0.000    0.471    0.000 vec.py:20(__init__)
+   129568    0.070    0.000    0.382    0.000 copy.py:220(<listcomp>)
+   217852    0.160    0.000    0.380    0.000 vec.py:137(__init__)
+   191626    0.151    0.000    0.308    0.000 vec.py:154(__init__)
+  2344569    0.286    0.000    0.286    0.000 {method 'get' of 'dict' objects}
+   129238    0.115    0.000    0.209    0.000 vec.py:181(__init__)
+   127744    0.150    0.000    0.193    0.000 vec.py:106(__eq__)
+     3748    0.025    0.000    0.175    0.000 visu.py:107(draw_point)
+     7984    0.161    0.000    0.166    0.000 {built-in method builtins.__build_class__}
+   210548    0.112    0.000    0.153    0.000 copy.py:252(_keep_alive)
+  1692515    0.142    0.000    0.142    0.000 {built-in method builtins.id}
+   137666    0.038    0.000    0.141    0.000 copy.py:273(<genexpr>)
+     1452    0.058    0.000    0.104    0.000 visu.py:151(clear_area)
+   992617    0.096    0.000    0.096    0.000 {method 'append' of 'list' objects}
+     5624    0.014    0.000    0.092    0.000 __init__.py:2464(_create)
+   255488    0.088    0.000    0.088    0.000 visu.py:267(__init__)
+   395550    0.081    0.000    0.081    0.000 vec.py:22(<listcomp>)
+    68833    0.075    0.000    0.075    0.000 {method '__reduce_ex__' of 'object' objects}
+   137666    0.069    0.000    0.069    0.000 {built-in method builtins.getattr}
+     1874    0.009    0.000    0.066    0.000 visu.py:116(draw_edge)
+   797653    0.063    0.000    0.063    0.000 copy.py:190(_deepcopy_atomic)
+     3748    0.002    0.000    0.059    0.000 __init__.py:2493(create_rectangle)
+        1    0.000    0.000    0.056    0.056 __init__.py:1997(__init__)
+       52    0.000    0.000    0.056    0.001 g_eng.py:128(routine)
+        1    0.055    0.055    0.055    0.055 {built-in method _tkinter.create}
+       52    0.001    0.000    0.051    0.001 g_eng.py:90(check_collision)
+    68837    0.042    0.000    0.042    0.000 {built-in method builtins.hasattr}
+    68833    0.031    0.000    0.042    0.000 copyreg.py:87(__newobj__)
+     1874    0.002    0.000    0.037    0.000 __init__.py:2484(create_line)
+   127744    0.037    0.000    0.037    0.000 {built-in method math.tan}
+   160491    0.032    0.000    0.032    0.000 {built-in method builtins.isinstance}
+   131615    0.030    0.000    0.030    0.000 vec.py:86(<listcomp>)
+     7496    0.011    0.000    0.028    0.000 visu.py:102(convert_to_canvas_coord)
+     5656    0.011    0.000    0.028    0.000 __init__.py:1309(_options)
+     7559    0.015    0.000    0.024    0.000 vec.py:99(__truediv__)
+    80120    0.022    0.000    0.022    0.000 {method 'update' of 'dict' objects}
+    46779    0.017    0.000    0.020    0.000 main.py:101(is_time)
+     1452    0.020    0.000    0.020    0.000 visu.py:59(reset_check_in)
+       29    0.000    0.000    0.020    0.001 __init__.py:1694(__call__)
+     3915    0.011    0.000    0.018    0.000 vec.py:74(__add__)
+     4582    0.002    0.000    0.016    0.000 __init__.py:2506(delete)
+        1    0.000    0.000    0.016    0.016 __init__.py:2052(destroy)
+     5670    0.009    0.000    0.014    0.000 __init__.py:93(_cnfmerge)
+    68833    0.011    0.000    0.011    0.000 {built-in method __new__ of type object at 0x0000000062CBB620}
+        1    0.000    0.000    0.011    0.011 main.py:115(__init__)
+    68833    0.011    0.000    0.011    0.000 {built-in method builtins.issubclass}
+    74504    0.011    0.000    0.011    0.000 {method 'items' of 'dict' objects}
+    18740    0.006    0.000    0.010    0.000 vec.py:146(x)
+    18740    0.006    0.000    0.009    0.000 vec.py:149(y)
+     15/6    0.000    0.000    0.008    0.001 __init__.py:2296(destroy)
+       52    0.000    0.000    0.007    0.000 snake.py:48(move)
+       63    0.000    0.000    0.007    0.000 poly.py:132(create_cube4d)
+     7984    0.006    0.000    0.006    0.000 visu.py:293(<listcomp>)
+    37480    0.006    0.000    0.006    0.000 vec.py:34(get_set_coord)
+       56    0.000    0.000    0.006    0.000 snake.py:38(create_cube)
+        1    0.000    0.000    0.006    0.006 __init__.py:1472(configure)
+        1    0.000    0.000    0.006    0.006 __init__.py:1460(_configure)
+     7984    0.005    0.000    0.005    0.000 visu.py:266(EIndex)
+     8047    0.005    0.000    0.005    0.000 poly.py:16(__init__)
+       52    0.000    0.000    0.005    0.000 g_eng.py:116(evaluate_collision)
+       63    0.002    0.000    0.004    0.000 poly.py:67(cube4d)
+        5    0.000    0.000    0.004    0.001 snake.py:57(add_segment)
+    47829    0.003    0.000    0.003    0.000 {built-in method time.time}
+       54    0.000    0.000    0.003    0.000 __init__.py:339(set)
+       54    0.003    0.000    0.003    0.000 {method 'globalsetvar' of '_tkinter.tkapp' objects}
+        1    0.000    0.000    0.002    0.002 score.py:81(__init__)
+        1    0.000    0.000    0.002    0.002 score.py:33(__init__)
+     1874    0.002    0.000    0.002    0.000 visu.py:30(__init__)
+     5694    0.002    0.000    0.002    0.000 {built-in method builtins.len}
+       27    0.001    0.000    0.002    0.000 __init__.py:1382(_substitute)
+       15    0.000    0.000    0.002    0.000 __init__.py:2280(__init__)
+    11269    0.002    0.000    0.002    0.000 {built-in method _tkinter._flatten}
+       52    0.000    0.000    0.002    0.000 visu.py:98(clear_text)
+      398    0.001    0.000    0.002    0.000 g_eng.py:78(intersect)
+       62    0.000    0.000    0.002    0.000 score.py:13(__init__)
+       61    0.000    0.000    0.001    0.000 score.py:22(read_from_line)
+     7559    0.001    0.000    0.001    0.000 vec.py:101(<listcomp>)
+       61    0.000    0.000    0.001    0.000 {built-in method strptime}
+       61    0.000    0.000    0.001    0.000 _strptime.py:562(_strptime_datetime)
+     5975    0.001    0.000    0.001    0.000 {method 'getint' of '_tkinter.tkapp' objects}
+       61    0.001    0.000    0.001    0.000 _strptime.py:321(_strptime)
+        5    0.000    0.000    0.001    0.000 {built-in method builtins.print}
+       14    0.000    0.000    0.001    0.000 iostream.py:342(write)
+       15    0.001    0.000    0.001    0.000 iostream.py:180(schedule)
+        1    0.000    0.000    0.001    0.001 score.py:89(render_scores)
+        5    0.000    0.000    0.001    0.000 __init__.py:2742(__init__)
+     3915    0.001    0.000    0.001    0.000 vec.py:77(<listcomp>)
+        6    0.000    0.000    0.001    0.000 g_eng.py:56(initialize_food)
+        1    0.000    0.000    0.001    0.001 g_eng.py:19(__init__)
+     5679    0.001    0.000    0.001    0.000 {built-in method builtins.callable}
+        1    0.000    0.000    0.001    0.001 score.py:85(add_score)
+        1    0.000    0.000    0.001    0.001 score.py:53(write_scores)
+      297    0.000    0.000    0.001    0.000 __init__.py:1388(getint_event)
+        3    0.000    0.000    0.001    0.000 __init__.py:2855(__init__)
+        3    0.000    0.000    0.000    0.000 visu.py:66(__init__)
+       63    0.000    0.000    0.000    0.000 vec.py:92(__mul__)
+        1    0.000    0.000    0.000    0.000 visu.py:179(__init__)
+        1    0.000    0.000    0.000    0.000 snake.py:12(__init__)
+       53    0.000    0.000    0.000    0.000 g_eng.py:42(generate_plist)
+        1    0.000    0.000    0.000    0.000 __init__.py:2061(readprofile)
+        5    0.000    0.000    0.000    0.000 genericpath.py:27(isfile)
+        2    0.000    0.000    0.000    0.000 visu.py:93(add_text)
+        5    0.000    0.000    0.000    0.000 {built-in method nt.stat}
+        2    0.000    0.000    0.000    0.000 __init__.py:2496(create_text)
+        2    0.000    0.000    0.000    0.000 {built-in method io.open}
+       28    0.000    0.000    0.000    0.000 __init__.py:1206(bind)
+       61    0.000    0.000    0.000    0.000 _strptime.py:29(_getlang)
+       28    0.000    0.000    0.000    0.000 __init__.py:1189(_bind)
+       61    0.000    0.000    0.000    0.000 locale.py:565(getlocale)
+       27    0.000    0.000    0.000    0.000 __init__.py:1334(nametowidget)
+       52    0.000    0.000    0.000    0.000 main.py:81(get_key)
+       33    0.000    0.000    0.000    0.000 __init__.py:1351(_register)
+        3    0.000    0.000    0.000    0.000 __init__.py:2389(__init__)
+        6    0.000    0.000    0.000    0.000 g_eng.py:58(generate_rand_point)
+       27    0.000    0.000    0.000    0.000 main.py:272(move)
+       16    0.000    0.000    0.000    0.000 __init__.py:581(destroy)
+       27    0.000    0.000    0.000    0.000 enum.py:265(__call__)
+       79    0.000    0.000    0.000    0.000 {method 'pop' of 'list' objects}
+        1    0.000    0.000    0.000    0.000 __init__.py:2027(_loadtk)
+        2    0.000    0.000    0.000    0.000 prj.py:125(calc_tmatrix)
+       15    0.000    0.000    0.000    0.000 __init__.py:2247(_setup)
+        1    0.000    0.000    0.000    0.000 __init__.py:2316(__init__)
+        2    0.000    0.000    0.000    0.000 __init__.py:1950(wm_protocol)
+        6    0.000    0.000    0.000    0.000 __init__.py:2203(grid_configure)
+        3    0.000    0.000    0.000    0.000 __init__.py:2724(__init__)
+        5    0.000    0.000    0.000    0.000 __init__.py:2869(add)
+       61    0.000    0.000    0.000    0.000 locale.py:462(_parse_localename)
+       24    0.000    0.000    0.000    0.000 random.py:172(randrange)
+       56    0.000    0.000    0.000    0.000 {method 'getboolean' of '_tkinter.tkapp' objects}
+        2    0.000    0.000    0.000    0.000 prj.py:52(calc_tmatrix)
+        6    0.000    0.000    0.000    0.000 vec.py:203(cross)
+       35    0.000    0.000    0.000    0.000 {method 'deletecommand' of '_tkinter.tkapp' objects}
+        1    0.000    0.000    0.000    0.000 prj.py:103(__init__)
+       61    0.000    0.000    0.000    0.000 {built-in method _locale.setlocale}
+       61    0.000    0.000    0.000    0.000 {method 'groupdict' of '_sre.SRE_Match' objects}
+       61    0.000    0.000    0.000    0.000 {method 'match' of '_sre.SRE_Pattern' objects}
+        1    0.000    0.000    0.000    0.000 prj.py:26(__init__)
+        1    0.000    0.000    0.000    0.000 {method 'readlines' of '_io._IOBase' objects}
+       27    0.000    0.000    0.000    0.000 main.py:78(push_key)
+        1    0.000    0.000    0.000    0.000 <string>:1(<module>)
+       61    0.000    0.000    0.000    0.000 locale.py:379(normalize)
+       27    0.000    0.000    0.000    0.000 enum.py:515(__new__)
+        1    0.000    0.000    0.000    0.000 prj.py:160(change_position)
+        2    0.000    0.000    0.000    0.000 __init__.py:2879(add_command)
+       88    0.000    0.000    0.000    0.000 {method 'split' of 'str' objects}
+       10    0.000    0.000    0.000    0.000 {method 'strftime' of 'datetime.date' objects}
+       15    0.000    0.000    0.000    0.000 threading.py:1104(is_alive)
+       24    0.000    0.000    0.000    0.000 random.py:222(_randbelow)
+       35    0.000    0.000    0.000    0.000 {method 'createcommand' of '_tkinter.tkapp' objects}
+        1    0.000    0.000    0.000    0.000 __init__.py:467(__init__)
+       27    0.000    0.000    0.000    0.000 snake.py:41(change_dir)
+        1    0.000    0.000    0.000    0.000 __init__.py:296(__init__)
+        4    0.000    0.000    0.000    0.000 ntpath.py:74(join)
+       10    0.000    0.000    0.000    0.000 vec.py:49(normalize)
+        3    0.000    0.000    0.000    0.000 __init__.py:2873(add_cascade)
+        1    0.000    0.000    0.000    0.000 __init__.py:325(__del__)
+        1    0.000    0.000    0.000    0.000 score.py:62(get_top_ten_scores)
+        1    0.000    0.000    0.000    0.000 ntpath.py:233(basename)
+        1    0.000    0.000    0.000    0.000 ntpath.py:199(split)
+        2    0.000    0.000    0.000    0.000 copyreg.py:96(_slotnames)
+        9    0.000    0.000    0.000    0.000 ntpath.py:121(splitdrive)
+       15    0.000    0.000    0.000    0.000 {built-in method nt.urandom}
+        1    0.000    0.000    0.000    0.000 prj.py:93(change_position)
+        5    0.000    0.000    0.000    0.000 __init__.py:2119(pack_configure)
+       14    0.000    0.000    0.000    0.000 vec.py:39(magnitude)
+        1    0.000    0.000    0.000    0.000 {built-in method builtins.sorted}
+        4    0.000    0.000    0.000    0.000 __init__.py:59(_stringify)
+       29    0.000    0.000    0.000    0.000 __init__.py:1373(_root)
+        4    0.000    0.000    0.000    0.000 vec.py:173(cross)
+       63    0.000    0.000    0.000    0.000 vec.py:94(<listcomp>)
+       15    0.000    0.000    0.000    0.000 threading.py:1062(_wait_for_tstate_lock)
+        1    0.000    0.000    0.000    0.000 _collections_abc.py:664(__contains__)
+       14    0.000    0.000    0.000    0.000 iostream.py:284(_is_master_process)
+       33    0.000    0.000    0.000    0.000 __init__.py:1689(__init__)
+        3    0.000    0.000    0.000    0.000 __init__.py:1977(wm_title)
+        1    0.000    0.000    0.000    0.000 os.py:664(__getitem__)
+        1    0.000    0.000    0.000    0.000 ntpath.py:222(splitext)
+        2    0.000    0.000    0.000    0.000 _bootlocale.py:11(getpreferredencoding)
+       14    0.000    0.000    0.000    0.000 iostream.py:297(_schedule_flush)
+        8    0.000    0.000    0.000    0.000 {method 'search' of '_sre.SRE_Pattern' objects}
+      122    0.000    0.000    0.000    0.000 {method 'toordinal' of 'datetime.date' objects}
+       15    0.000    0.000    0.000    0.000 iostream.py:87(_event_pipe)
+       15    0.000    0.000    0.000    0.000 __init__.py:2289(<listcomp>)
+       76    0.000    0.000    0.000    0.000 {method 'lower' of 'str' objects}
+        3    0.000    0.000    0.000    0.000 cp1252.py:22(decode)
+       15    0.000    0.000    0.000    0.000 {method 'acquire' of '_thread.lock' objects}
+       62    0.000    0.000    0.000    0.000 score.py:65(<lambda>)
+       34    0.000    0.000    0.000    0.000 {built-in method builtins.repr}
+        2    0.000    0.000    0.000    0.000 {built-in method _locale._getdefaultlocale}
+       43    0.000    0.000    0.000    0.000 {method 'getrandbits' of '_random.Random' objects}
+       10    0.000    0.000    0.000    0.000 {method 'format' of 'str' objects}
+        1    0.000    0.000    0.000    0.000 score.py:57(<listcomp>)
+        2    0.000    0.000    0.000    0.000 visu.py:245(__init__)
+       14    0.000    0.000    0.000    0.000 {built-in method nt.getpid}
+        1    0.000    0.000    0.000    0.000 {method 'write' of '_io.TextIOWrapper' objects}
+        3    0.000    0.000    0.000    0.000 {built-in method _codecs.charmap_decode}
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:989(_handle_fromlist)
+        2    0.000    0.000    0.000    0.000 __init__.py:1876(wm_iconname)
+        1    0.000    0.000    0.000    0.000 score.py:27(__str__)
+       61    0.000    0.000    0.000    0.000 {method 'keys' of 'dict' objects}
+        2    0.000    0.000    0.000    0.000 {method 'getvar' of '_tkinter.tkapp' objects}
+        1    0.000    0.000    0.000    0.000 genericpath.py:117(_splitext)
+       61    0.000    0.000    0.000    0.000 {method 'weekday' of 'datetime.date' objects}
+        2    0.000    0.000    0.000    0.000 {method 'get' of 'mappingproxy' objects}
+        1    0.000    0.000    0.000    0.000 os.py:732(encodekey)
+        2    0.000    0.000    0.000    0.000 cp1252.py:18(encode)
+       61    0.000    0.000    0.000    0.000 {method 'end' of '_sre.SRE_Match' objects}
+        3    0.000    0.000    0.000    0.000 main.py:97(__init__)
+       15    0.000    0.000    0.000    0.000 {built-in method nt.fspath}
+       15    0.000    0.000    0.000    0.000 threading.py:506(is_set)
+        5    0.000    0.000    0.000    0.000 {method 'replace' of 'str' objects}
+        1    0.000    0.000    0.000    0.000 main.py:67(__init__)
+       14    0.000    0.000    0.000    0.000 {built-in method math.sqrt}
+        1    0.000    0.000    0.000    0.000 {built-in method now}
+       16    0.000    0.000    0.000    0.000 {method 'values' of 'dict' objects}
+       12    0.000    0.000    0.000    0.000 main.py:207(<listcomp>)
+        1    0.000    0.000    0.000    0.000 {method 'isoformat' of 'datetime.datetime' objects}
+        1    0.000    0.000    0.000    0.000 {method 'writelines' of '_io._IOBase' objects}
+        1    0.000    0.000    0.000    0.000 {method 'globalunsetvar' of '_tkinter.tkapp' objects}
+       24    0.000    0.000    0.000    0.000 {method 'bit_length' of 'int' objects}
+        4    0.000    0.000    0.000    0.000 {method 'join' of 'str' objects}
+        1    0.000    0.000    0.000    0.000 os.py:726(check_str)
+        3    0.000    0.000    0.000    0.000 visu.py:42(__init__)
+        2    0.000    0.000    0.000    0.000 {built-in method _codecs.charmap_encode}
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+        1    0.000    0.000    0.000    0.000 score.py:50(add_score)
+        5    0.000    0.000    0.000    0.000 {method 'upper' of 'str' objects}
+        6    0.000    0.000    0.000    0.000 main.py:191(<listcomp>)
+        1    0.000    0.000    0.000    0.000 codecs.py:185(__init__)
+        1    0.000    0.000    0.000    0.000 codecs.py:259(__init__)
+        1    0.000    0.000    0.000    0.000 ntpath.py:33(_get_bothseps)
+        3    0.000    0.000    0.000    0.000 __init__.py:1492(__str__)
+        3    0.000    0.000    0.000    0.000 {method 'rfind' of 'str' objects}
+        1    0.000    0.000    0.000    0.000 {built-in method builtins.max}
+        1    0.000    0.000    0.000    0.000 {built-in method _stat.S_ISREG}
+        1    0.000    0.000    0.000    0.000 {method 'rstrip' of 'str' objects}
+        1    0.000    0.000    0.000    0.000 codecs.py:213(setstate)
+        1    0.000    0.000    0.000    0.000 __init__.py:336(__str__)
+        1    0.000    0.000    0.000    0.000 {method 'remove' of 'list' objects}
+
+

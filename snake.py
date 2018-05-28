@@ -4,20 +4,34 @@ Created on Tue May 22 14:25:00 2018
 
 @author: Mauro
 """
+
+#==============================================================================
+# Snake class
+#==============================================================================
+
 import vec, poly
 import copy
+
+# to do: make segment smaller in the directions orthogonal to the direction
+#        this will make the snake less simmetric
+#        head could be a thetra hedron or half a hypersphere on top of
+#       cylinder
 
 class Snake:
     
     def __init__(self):
+        # position of the head
         self.head_pos = vec.V4(0, 0, 0, 0)
+        # direction
         self.head_dir ="UP"
-        self.size = 4
+        #initial size
+        init_size = 4
         
+        # polygon list of the snake
         self.p_list = []
         
-        for cube in range(self.size):
-            next_cube_center = self.head_pos - vec.V4(self.size - cube, 0, 0 , 0)
+        for i in range(init_size):
+            next_cube_center = self.head_pos - vec.V4(init_size - i, 0, 0 , 0)
             next_cube = self.create_cube(next_cube_center)
             self.p_list.append(next_cube)
         
@@ -32,9 +46,10 @@ class Snake:
             v[int(i / 2)] = 1 if i % 2 == 0 else -1
             self.dir_v[direction] = vec.V4(v)
             
-            # generate forbidden directions
+            # generate forbidden directions (ex. UP -> cant go DOWN)
             self.opposite_dir[direction] = possible_dirs[i + (1 if i % 2 == 0 else -1)]        
     
+    # create an hypercube segment
     def create_cube(self, point):
         return poly.create_cube4d(point, 1., "green")
     
@@ -57,6 +72,7 @@ class Snake:
     def add_segment(self):
         # copy the last block
         last_block = copy.deepcopy(self.p_list[-1])
+        # add to polygon list
         self.p_list.append(last_block)
 
 

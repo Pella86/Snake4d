@@ -5,57 +5,68 @@ Created on Fri May 18 20:44:22 2018
 @author: Mauro
 """
 
-# m rows, n columns
+#==============================================================================
+# Matrix class
+#   utilities for an nxm 2D matrix
+#==============================================================================
 
+# errors
 class MatExcept(Exception):
     pass
 
+# class
 class Matrix:
     
     def __init__(self, m, n = None):
+        # store matrix in a linear vector
         self.mat = []
+        
+        # if the first argument is a list and is a list of list
+        # construct the matrix starting with that as an element
         if type(m) == list and type(m[0]) is list and n is None:
             self.m = len(m)
             self.n = len(m[0])
-            self.init_mat()
             
+            self.init_mat()
             for i in range(self.m):
                 for j in range(self.n):
                     self[i, j] = m[i][j]
         
-        elif type(m) is list:
+        # if the first argument is a list, yet not a list of list
+        # assume the user wants to create a mx1 vector
+        elif type(m) is list and n is None:
             self.m = len(m)
             self.n = 1
             
             self.init_mat()
-            
             for i in range(self.m):
                 self[i, 0] = m[i]
-
+                
+        # else initialize a 0ed mxn matrix
         else:
             self.m = m
             self.n = n
             self.init_mat()
-            
 
-    
     def init_mat(self):
         for i in range(self.m):
             for j in range(self.n):
                 self.mat.append(0)        
     
-    
+    # getter    
     def __getitem__(self, idx):
         linear_index = idx[1] * self.m + idx[0]      
         return self.mat[linear_index]
     
+    # setter
     def __setitem__(self, idx, c):
         if idx[0] >= self.m or idx[0] < 0: raise MatExcept("Matrix: row out of range")
-        if idx[1] >= self.n or idx[1] < 0: raise MatExcept("Matrix: row out of range")        
+        if idx[1] >= self.n or idx[1] < 0: raise MatExcept("Matrix: col out of range")        
         
         linear_index = idx[1] * self.m + idx[0]
         self.mat[linear_index] = c
-        
+     
+    # operator + elementwise sum
     def __add__(self, m2):
         if self.m == m2.m and self.n == m2.n:
             new_mat = []
@@ -68,7 +79,8 @@ class Matrix:
             
         else:
             raise MatExcept("Matrix: addition not same size")
-
+    
+    # operator - element wise
     def __sub__(self, m2):
         if self.m == m2.m and self.n == m2.n:
             new_mat = []
@@ -82,6 +94,7 @@ class Matrix:
         else:
             raise MatExcept("Matrix: subtraction not same size") 
     
+    # matrix multiplication
     def __mul__(self, m2):
         if self.n == m2.m:
             mulmat = Matrix(self.m, m2.n)
@@ -89,8 +102,7 @@ class Matrix:
                 for j in range(mulmat.n):
                     for m in range(self.n):
                         mulmat[i, j] += self[i, m] * m2[m, j]
-            return mulmat
-                    
+            return mulmat       
         else:
             raise MatExcept("Matrix: multiplication columns diff then rows")
     

@@ -5,40 +5,33 @@ Created on Wed May 16 23:46:53 2018
 @author: Mauro
 """
 
+#==============================================================================
+# Quaternion utilities
+#==============================================================================
+
 import math, vec
 import copy
 
-class Z(vec.V2):
-    
-    def __init__(self, im, re):
-        super().__init__(im, re)
-
-    def re(self, value = False):
-        return self.get_set_coord(0, value)    
-
-    def im(self, value = False):
-        return self.get_set_coord(1, value)
-
-    def zi(self):
-        self.im(-self.im())
-        return self
-
 class Q(vec.V4):
     
+    # possibly change in Q(x,y,z,w) or Q(s, v)
     def __init__(self, w, x, y = None, z = None):
         
+        # if the first argument is a vector
         if isinstance(x, vec.V3):
             y = x[1]
             z = x[2]
             x = x[0]
 
         super().__init__(x, y, z, w)
-        
+    
+    # inverse of the quaternion
     def qi(self):
         for i in range(0, self.dimension - 1):
             self.coords[i] = -self.coords[i]
         return self
     
+    # cross product
     def cross(self, q2):
         s1 = self.w()
         s2 = q2.w()
@@ -52,6 +45,7 @@ class Q(vec.V4):
 
         return Q(s3, v3)
     
+    # hamilton multiplication
     def hamilton(self, q):
         a1 = self.w()
         a2 = q.w()
@@ -72,6 +66,7 @@ class Q(vec.V4):
         
         return Q(w, x, y, z)
     
+    # get the vector part of the quaternion
     def get_vector(self):
         return vec.V3(self.x(), self.y(), self.z())
         
@@ -89,46 +84,8 @@ def rot_around_axis(point, axis, angle):
     
     prot = q.cross(p).cross(qi)
     return vec.V3(prot.x(), prot.y(), prot.z())
-    
-
-def rotx(theta):
-    s = math.cos(theta / 2)
-    u = vec.V3(1, 0, 0)
-    v = u * math.sin(theta / 2)
-    return Q(s, v)
-
-def rotx_point(point, theta):
-    p = Q(0, point)
-    q = rotx(theta)
-    q1 = copy.deepcopy(q)
-    q1.qi()
-    
-    prot = q.cross(p).cross(q1)
-    return vec.V3(prot.x(), prot.y(), prot.z())
-
-    
-#def rotx(theta):
-#	s = cos(theta/2)
-#	u = V3(1,0,0)
-#	v = scalar3(sin(theta/2),u)
-#	return SQ(s,v)
-#
-#def rotx_point(point,theta):
-#	p = Q(0,point.c[0],point.c[1],point.c[2])
-#	q = rotx(theta)
-#	q1 = q.qi()
-#	prot = qxq(qxq(q,p),q1)
-#	return  V3(prot.x,prot.y,prot.z)
         
 if __name__ == "__main__":
-    
-    z1 = Z(1, 3)
-    
-    z1.zi()
-    
-    print(z1)
-    
-    print(z1.magnitude())
     
     print("----------")
     
@@ -142,18 +99,12 @@ if __name__ == "__main__":
     
     print(q1.cross(q2))
     
-    print("----------")
-   
-    v1 = vec.V3(1, 1, 0)
-    
-    t = math.radians(90)
-    
-    v2 = rotx_point(v1, t)
-    
-    print(v2)
     
     print("----------")
     
+    # temptative quaternion rotation
+    # problem is to find the given angle and axis
+    # probably use bivectors or a rotor
     qL = Q(1, 0, 0, 0)
     qL.normalize()
     qR = Q(0, 0, 1, 0)

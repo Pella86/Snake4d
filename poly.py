@@ -7,12 +7,22 @@ Created on Thu May 17 15:34:47 2018
 
 import vec
 
+#==============================================================================
+# Polygon class
+# simple utility for the polygon class
+#==============================================================================
+
 class Polygon:
     def __init__(self):
         self.v_list = []
         self.e_list = []
         self.color = "red"
 
+#==============================================================================
+# Generate 3d cube
+#==============================================================================
+
+# v1, v2 are the respectively lower and upper corner
 def cube3d(v1,v2):
     polygon = Polygon()
     
@@ -49,11 +59,16 @@ def cube3d(v1,v2):
     
     return polygon
 
+#==============================================================================
+# Generate hypercube
+#==============================================================================
+
+# v0 and v1 are respectively the lower and upper corner
 def cube4d(v0,v1):
     polygon = Polygon()
     
-    polygon.v_list.append(v0)
-    polygon.v_list.append(v1)
+    polygon.v_list.append(v0) #v0
+    polygon.v_list.append(v1) #v1
     
     polygon.v_list.append(vec.V4(v1[0],v0[1],v0[2],v0[3])) #v2
     polygon.v_list.append(vec.V4(v1[0],v1[1],v0[2],v0[3])) #v3
@@ -63,13 +78,13 @@ def cube4d(v0,v1):
     polygon.v_list.append(vec.V4(v1[0],v1[1],v1[2],v0[3])) #v7
     polygon.v_list.append(vec.V4(v0[0],v1[1],v1[2],v0[3])) #v8
     
-    polygon.v_list.append(vec.V4(v0[0],v0[1],v0[2],v1[3]))
-    polygon.v_list.append(vec.V4(v1[0],v0[1],v0[2],v1[3]))
-    polygon.v_list.append(vec.V4(v1[0],v1[1],v0[2],v1[3]))
-    polygon.v_list.append(vec.V4(v0[0],v1[1],v0[2],v1[3]))
-    polygon.v_list.append(vec.V4(v0[0],v0[1],v1[2],v1[3]))
-    polygon.v_list.append(vec.V4(v1[0],v0[1],v1[2],v1[3]))
-    polygon.v_list.append(vec.V4(v0[0],v1[1],v1[2],v1[3]))
+    polygon.v_list.append(vec.V4(v0[0],v0[1],v0[2],v1[3])) #v9
+    polygon.v_list.append(vec.V4(v1[0],v0[1],v0[2],v1[3])) #v10
+    polygon.v_list.append(vec.V4(v1[0],v1[1],v0[2],v1[3])) #v11
+    polygon.v_list.append(vec.V4(v0[0],v1[1],v0[2],v1[3])) #v12
+    polygon.v_list.append(vec.V4(v0[0],v0[1],v1[2],v1[3])) #v13
+    polygon.v_list.append(vec.V4(v1[0],v0[1],v1[2],v1[3])) #v14
+    polygon.v_list.append(vec.V4(v0[0],v1[1],v1[2],v1[3])) #v15
     
     polygon.e_list.append((0,2))
     polygon.e_list.append((0,9))
@@ -109,6 +124,10 @@ def cube4d(v0,v1):
     polygon.e_list.append((1,15))
     polygon.e_list.append((15,13))
     return polygon
+
+#==============================================================================
+# Generate an hypercube given a center and a size
+#==============================================================================
 
 def create_cube4d( point, size, color):
     v = vec.V4(1, 1, 1, 1) * size/2.0

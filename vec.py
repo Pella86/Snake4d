@@ -5,16 +5,25 @@ Created on Wed May 16 22:37:10 2018
 @author: Mauro
 """
 
-# Vector utility for 2, 3, 4 dimensions
+#==============================================================================
+# # Vector utility for 2, 3, 4 dimensions
+#==============================================================================
 
 import math
 
 # is close constant
 epsilon = 0.00000001
 
+#==============================================================================
+# Errors
+#==============================================================================
+
 class VecExcept(Exception):
     pass
 
+#==============================================================================
+# Vector base class
+#==============================================================================
 
 class Vector:
     
@@ -26,41 +35,52 @@ class Vector:
             
         self.dimension = dimensions
     
+    # setter and getter
     def __getitem__(self, i):
         return self.coords[i]
 
     def __setitem__(self, i, v):
         self.coords[i] = v
     
+    # allows to define return v.x() and v.x() = 5
     def get_set_coord(self, coord_idx, value = False):
         if value:
             self.coords[coord_idx] = value
         return self.coords[coord_idx]
     
+    # magnitude of the vector
     def magnitude(self):
         s = 0
         for c in self.coords:
             s += c**2
         return math.sqrt(s)
     
+    # helper function for checking the dimensions
     def check_dimensions(self, v2):
         if self.dimension != v2.dimension:
-            raise  VecExcept("wrong dimensions")  
-    
+            raise  VecExcept("Vector: wrong dimensions")  
+
+    def check_class(self, v2):
+        return self.__class__ == v2.__class__
+  
+    # normalize to 1
     def normalize(self):
         m = self.magnitude()
+        if m == 0: VecExcept("Vector: module is 0")
         for i in range(self.dimension):
             self.coords[i] /= m
         return self
-            
+    
+    # angle from a axis        
     def angle(self, v2):
         m = self.magnitude() * v2.magnitude()
         if m != 0:
             cos_theta = (self.dot(v2) ) / m
             return math.acos(cos_theta)
         else:
-            VecExcept("Zero Division Error")      
- 
+            VecExcept("Vector: Zero Division Error")      
+
+    # dot product
     def dot(self, v2):
         self.check_dimensions(v2)
         dot_p = 0
@@ -68,9 +88,7 @@ class Vector:
             dot_p += self.coords[i] * v2[i]
         return dot_p           
     
-    def check_class(self, v2):
-        return self.__class__ == v2.__class__
-    
+    # operator + (elementwise sum)    
     def __add__(self, v2):
         self.check_dimensions(v2)        
        
@@ -81,6 +99,7 @@ class Vector:
         
         return self.__class__(new_coords)   
     
+    # operator - (elementwise subtraction)
     def __sub__(self, v2):
         self.check_dimensions(v2)        
         new_coords = [0 for i in range(self.dimension)]
@@ -88,7 +107,7 @@ class Vector:
             new_coords[i] = self.coords[i] - v2[i]
         return self.__class__(new_coords)   
     
-
+    # operator * (elementwise multiplication with a constant)
     def __mul__(self, k):
         # if k is a vector do the dot product
         new_coords = [0 for i in range(self.dimension)]
@@ -96,13 +115,15 @@ class Vector:
             new_coords[i] = self.coords[i] * k
         return self.__class__(new_coords)
     
+    # operator / (elementwise division)
     def __truediv__(self, d):
-        if d == 0: raise VecExcept("Zero Division Error")
+        if d == 0: raise VecExcept("Vector: Zero Division Error")
         new_coords = [0 for i in range(self.dimension)]
         for i in range(self.dimension):
             new_coords[i] = self.coords[i] / d
         return self.__class__(new_coords)        
     
+    # operator == (check exactly if the vectors are the same)
     def __eq__(self, v2):
         self.check_dimensions(v2)
         for i in range(self.dimension):
@@ -110,20 +131,16 @@ class Vector:
                 return False
         return True
 
+    # if the vector are close enough they are considered the same
     def is_close(self, v2):
         self.check_dimensions(v2)
-        
-#        if abs(self.dot(v2)) > epsilon:
-#            return False
-#        for i in range(self.dimension):
-#            if self.coords[i] - v2[i] > epsilon:
-#                return False
 
         for i in range(self.dimension):
             if abs(self.coords[i] - v2[i]) > epsilon:
                 return False
         return True        
-        
+    
+    # representation to string    
     def __str__(self):
         s = "("
         for c in self.coords:
@@ -131,6 +148,9 @@ class Vector:
         s = s[:-1] + ")"
         return s
 
+#==============================================================================
+# 2d vector
+#==============================================================================
 
 class V2(Vector):
     
@@ -148,6 +168,10 @@ class V2(Vector):
 
     def y(self, c = False):
         return self.get_set_coord(1, c)
+
+#==============================================================================
+# 3d vector
+#==============================================================================
 
 class V3(Vector):
     
@@ -169,17 +193,22 @@ class V3(Vector):
 
     def z(self, c = False):
         return self.get_set_coord(2, c)  
-
+    
+    # cross product between 2 vectors
     def cross(self, v2):
         x = self[1] * v2[2] - self[2] * v2[1]
         y = self[2] * v2[0] - self[0] * v2[2]
         z = self[0] * v2[1] - self[1] * v2[0]
         return V3(x,y,z)
-    
+
+#==============================================================================
+# 4d vector    
+#==============================================================================
+
 class V4(Vector):
     
     def __init__(self, x, y = None, z = None, w = None):
-        if y is None and z is None and w is None and type(x) is list:
+        if type(x) is list and y is None and z is None and w is None:
             super().__init__(4, x)         
         else:
             super().__init__(4)
@@ -218,69 +247,52 @@ class V4(Vector):
 
 
 if __name__ == "__main__":
-#    v2a = V2(0, 1)
-#    
-#    v2b = V2(1, 0)
-#    
-#    v2c = v2a + v2b
-#    print(v2c)
-#    
-#    print(v2a, v2b, v2c)
-#    
-#    print(type(v2c))
-#    
-#    print("--------------")
-#    
-#    v3a = V3(0, 0, 1)
-#    v3b = V3(1, 0, 1)
-#    v3c = (v3a + v3b) / 2
-#    print(type(v3c))
-#    
-#    print(v3c, type(v3c))
+    print("vector math utilites")
     
-#    v3 = V3(0, 2, 3)
-#    
-#    print(v2a)
-#    print(v3)
-#    
-#    try:
-#        print(v2 + v3)
-#    except VecExcept:
-#        pass
+    print("------- 2d -------")
     
-#    v3a = V3(1, 2, 3)
-#    v3b = V3(3, 4, 5)
-#    
-#    print(v3a, v3b)
+    va = V2(0, 1)
+    print("va:", va)
     
-#    v3a = V3(3, 4, 5)
-#    
-#    v3c = v3a + v3 * 5
-#    
-#    print(v3c)
-#    print(v3c.magnitude())
-#
-#    
-#    print(v3, v3a)    
-#    dotprod = v3.dot(v3a)
-#    
-#    print(dotprod)
-#    
-#    a = v3.angle(V3(0,0,1))
-#    
-#    print(math.degrees(a))
-#    
-#    crossr = v3.cross(V3(0,0,1))
-#    
-#    print(crossr)
-#    
-#    print(crossr.normalize())
+    vb = V2(1, 0)
+    print("vb:", vb)
+    
+    vc = va + vb
+    print("sum:", vc)
+    
+    print("------- 3d -------")
+    
+    va = V3(0, 0, 1)
+    print("va:", va)
+    print("angle to x axis:", math.degrees(va.angle(V3(1, 0, 0))))
+    
+    vb = V3(1, 0, 1)
+    print("vb:", vb)
+    
+    vc = (va + vb) / 2
+    print("mean:", vc)
+    
+    print("mag:", vc.magnitude())
+    print("dot:", vc.dot(va))
+    
+    print("cross:", vc.cross(va))
+
+     
+    v2 = V2(1, 0)
+    v3 = V3(1, 0, 0)
+    
+    try:
+        v = v2 + v3
+    except VecExcept as e:
+        print(e)
+        
+    print("------- 4d -------")
 
     a = V4(4, 1, 2, 3)
     b = V4(3, 2, 1, 1)
     c = V4(1, 2, 3, 2)
     
-    print(a.cross(b, c).normalize())
+    print("cross 4:", a.cross(b, c).normalize())
     
     
     

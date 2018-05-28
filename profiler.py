@@ -8,10 +8,21 @@ Created on Wed May 23 23:12:55 2018
 import cProfile
 import main
 import pstats
+import os
+
+
+test_name = "Opt_draw_functions"
+run_prof = False
+
+test_folder = "./profiler_data/" + test_name + os.sep
+if not os.path.isdir(test_folder):
+    os.mkdir(test_folder)
 
 if __name__ == "__main__":
-#    cProfile.runctx("main.main()", globals(), locals(), "./profiler_dats/test_1/profiler_stats")
-    with open("./profiler_data/test_1/profiler_beautify_stats.txt", "w") as f:
-        p = pstats.Stats('stats', stream=f)
-        p.strip_dirs().sort_stats("cumulative").print_stats()
-    
+    if run_prof:
+        cProfile.runctx("main.main()", globals(), locals(), test_folder + "stats")
+    else:
+        with open( test_folder + "beauty_stats.txt", "w") as f:
+            p = pstats.Stats(test_folder + 'stats', stream=f)
+            p.strip_dirs().sort_stats("cumulative").print_stats()
+        

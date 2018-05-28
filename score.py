@@ -4,11 +4,19 @@ Created on Fri May 25 22:01:56 2018
 
 @author: Mauro
 """
+#==============================================================================
+# Score board
+#==============================================================================
+
 import datetime
 import os
 from tkinter import Label, Toplevel
-import visu, poly, vec
+#import visu, poly, vec #needed for the graph
 
+#==============================================================================
+# Class score
+#   small class to store a score and a date
+#==============================================================================
 class Score:
     def __init__(self, date, score = None):
         if type(date) == str:
@@ -29,6 +37,12 @@ class Score:
         s += str(self.score)
         return s
 
+#==============================================================================
+# A list of scores
+#    the class manages the reading and writing to file of the scores and the
+#   sorting of different scores
+#==============================================================================
+
 class Scores:
     def __init__(self):
         
@@ -36,11 +50,13 @@ class Scores:
         self.scores = []
         self.new_scores = []
         
+        # read in from the score file the scores
         old_scores = []
         if os.path.isfile(self.filename):
             with open(self.filename, "r") as f:
                 old_scores = f.readlines()
         
+        # parse the line in scores
         for line in old_scores:
             s = Score(line)
             self.scores.append(s)
@@ -59,6 +75,7 @@ class Scores:
         self.scores = self.scores + self.new_scores
         self.new_scores = []
       
+    # get the top ten scores in terms of score
     def get_top_ten_scores(self):
         all_scores = self.scores + self.new_scores
         
@@ -67,14 +84,17 @@ class Scores:
         
         return all_scores[:10]
     
+    # gets the last 20 scores in order of time
     def get_last_scores(self):
         all_scores = self.scores + self.new_scores
         
         all_scores = sorted(all_scores, key=lambda x : x.date)
         all_scores = all_scores[::-1]
         return all_scores[:20]
-        
 
+#==============================================================================
+# The GUI representation of the class scores        
+#==============================================================================
 
 class ScoreBoard:
     
@@ -101,7 +121,9 @@ class ScoreBoard:
             last_score = self.scores.new_scores[0]
         elif self.scores.scores:
             last_score = self.scores.scores[-1]
-            
+        
+        # create a list from the scores, if the last score is in the list
+        # split the list according to previous score - curr score - prev score
         label_list = []
         label_list.append([])
         idx = 0
@@ -124,6 +146,7 @@ class ScoreBoard:
         # construct the format
         format_score = "{: >" +  str(cwidth_score) + "}"
         
+        # *BUG* if is first or last in the list magics happen...
         for i, ss in enumerate(label_list):
             s = ""
             for score_line in ss:
@@ -133,7 +156,7 @@ class ScoreBoard:
                 s += score_line.date.strftime("%d %b %y") + " - " + fscore + "\n" 
             s = s[:len(s)-1]
             
-            if i == 1:
+            if (i == 1 and len(ss) == 3) or (i == 0 and len(ss) == 2):
                 color = "darkorange3"
                 rel = "groove"
             else:
@@ -144,7 +167,10 @@ class ScoreBoard:
                                borderwidth=2, relief=rel, padx=1, pady=1)
             
             ltop_board.grid(row=(i + 1), column = 0, padx=0, pady=0) 
+
 #        in case needed is a graph of the scores        
+#
+#
 #        row = len(label_list) + 1
 #        
 #        graph = visu.VisuArea(board, None, [250, 100], "Score Evolution")
