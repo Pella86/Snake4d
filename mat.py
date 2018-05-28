@@ -135,6 +135,10 @@ class Matrix:
         
         return s
 
+#==============================================================================
+# Squared Matrix utilities
+#   for a squared matrix (mxm)
+#==============================================================================
 
 class SquareMatrix(Matrix):
     
@@ -184,16 +188,16 @@ class SquareMatrix(Matrix):
         return imatrix
 
 if __name__ == "__main__":
+    print("--- init functions and assignment ----")
+    
     m = Matrix(2, 3)
     print(m)
     
     m[1, 2] = 1
-    
     print(m)
     
     m2 = Matrix(2, 3)
     m2[1, 2] = 3
-    
     print(m2)
     print(m2.transpose())
     
@@ -220,12 +224,15 @@ if __name__ == "__main__":
     
     m1 = [ [1, 2],
            [3, 4] ]
+    m1 = Matrix(m1)
+    
     m2 = [ [0, 1],
            [0, 0] ]
-    m1 = Matrix(m1)
     m2 = Matrix(m2)
+    
     mres = m1 * m2
     print(mres)
+    
     mres = m2 * m1
     print(mres)
     
