@@ -124,6 +124,8 @@ class GameEngine:
             self.snake.add_segment()
             self.food = self.initialize_food()
             self.score += 1
+    
+    
         
     def routine(self):
         # the game routine, checks the collision which will "move" the snake

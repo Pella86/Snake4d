@@ -5,6 +5,10 @@ Created on Thu May 17 13:20:44 2018
 @author: Mauro
 """
 
+# import sys to access the src folder
+import sys
+sys.path.append("./src")
+
 # py imports
 import time
 import datetime
@@ -23,18 +27,13 @@ import score
 # # TO DO list
 #==============================================================================
 
-# add help button
-# add high score panel
-# add text for the beginning and end
-#   - Press space to start if game is game_over
-#   - Press p or any key to pause/continue if game is running
-# add rotations
+# insert a option to save the files
 
 #==============================================================================
 # Help message
 #==============================================================================
 
-INFO_TEXT = '''*****************snake 4d********************\n
+INFO_TEXT = '''*****************snake 4d*****************\n
 Rules:                                 \n
     1. eat the food (blue cube)        \n
     2. don't hit the walls (black)     \n
@@ -56,8 +55,9 @@ K = IN                                 \n
 L = REVERSE                            \n
                                        \n
 To control the CAMERA use:             \n
-  X or C to control 3d rotations       \n
-  B or N or M to control 4d rotations  \n
+  Y, X, C to control 3d rotations       \n
+  V, B, N, M, T or Z to control 4d     \n
+  rotations                            \n
 **********************************************\n'''
 
 #==============================================================================
@@ -191,11 +191,11 @@ class MainApp:
         # start the game engine
         self.game = g_eng.GameEngine()
 
-        # creates top menu
-        self.create_menu()
-
         # root frame of tkinter
         self.root = root
+
+        # creates top menu
+        self.create_menu()
 
         # score label
         self.score_str = StringVar()
