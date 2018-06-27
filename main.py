@@ -377,7 +377,9 @@ class MainApp:
         draw_rate = Rate(1 / 25.0)
         game_rate = Rate(1 / 2.0)
         update_rate = Rate(1 / 50.0)
-
+        
+        game_frame_counter = 0
+        
         while True:
 
             # drawing scenese
@@ -405,6 +407,10 @@ class MainApp:
                         self.game.snake.change_dir(next_dir)
 
                     self.game.routine()
+                    
+                    # writes the frames
+                    self.game.write_frame("./frames/frame_" + str(game_frame_counter) + ".sk4")
+                    game_frame_counter += 1
 
                     # updates the score label
                     self.score_str.set("Score: " + str(self.game.score))

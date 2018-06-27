@@ -5,9 +5,13 @@ Created on Tue May 22 22:15:01 2018
 @author: Mauro
 """
 
-import snake, poly, vec
 import random
 import copy
+
+import snake
+import poly
+import vec
+import bfh
 
 #==============================================================================
 # Game Engine class
@@ -124,9 +128,7 @@ class GameEngine:
             self.snake.add_segment()
             self.food = self.initialize_food()
             self.score += 1
-    
-    
-        
+
     def routine(self):
         # the game routine, checks the collision which will "move" the snake
         # evaluates it and generates the new plist
@@ -134,5 +136,31 @@ class GameEngine:
         self.evaluate_collision(c)
         self.generate_plist()
         
-        
+    def write_frame(self, filename):
+        c_pol = 0
+        with open(filename, "wb") as f:
+            bf = bfh.BinaryFile(f)
+            bf.write("I", len(self.p_list))
+            for p in self.p_list:
+                p.as_bytes(bf)
+                c_pol += 1
+        print("written {} polyigons".format(c_pol))
+    
+    def read_frame(self, filename):
+        with open(filename, "rb") as f:
+            bf = bfh.BinaryFile(f)
+            # read length
+            p_list_len = bf.read("I")
             
+            self.p_list = [poly.Polygon() for i in range(p_list_len)]
+            
+            for p in self.p_list:
+                p.interpret_bytes(bf)
+            
+            
+if __name__ == "__main__":
+    geng = GameEngine()
+    geng.routine()
+
+    geng.write_frame("./frame_test.sk4") 
+    geng.read_frame("./frame_test.sk4")            

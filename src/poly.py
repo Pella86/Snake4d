@@ -5,7 +5,11 @@ Created on Thu May 17 15:34:47 2018
 @author: Mauro
 """
 
+import copy
+
 import vec
+import bfh
+
 
 #==============================================================================
 # Polygon class
@@ -16,7 +20,105 @@ class Polygon:
     def __init__(self):
         self.v_list = []
         self.e_list = []
+        self.f_list = []
         self.color = "red"
+    
+    def as_bytes(self, bf):
+        bf.write_string(self.color)
+        
+        # write vertex list
+        
+        bf.write("I", len(self.v_list))
+        
+        for v in self.v_list:
+            v.as_bytes(bf)
+        
+        # write edge list
+        
+        earr = []
+        for e in self.e_list:
+            earr.append(e[0])
+            earr.append(e[1])
+        
+        earrlen = len(earr)
+        bf.write("I", earrlen)
+        for e in earr:
+            bf.write("I", e)
+        
+        # write face list
+        farr = []
+        for f in self.f_list:
+            farr.append(f[0])
+            farr.append(f[1])
+            farr.append(f[2])
+            farr.append(f[3])
+        
+        farrlen = len(farr)
+        bf.write("I", farrlen)
+        for f in farr:
+            bf.write("I", f) 
+            
+    def interpret_bytes(self, bf):
+        # read the color
+        self.color = bf.read_string()
+        
+        # read vertex list
+        v_list = []
+        
+        # read len
+        v_len = bf.read("I")
+        
+        for i in range(v_len):
+            v4 = vec.V4(0, 0, 0, 0)
+            v4.interpret_bytes(bf)
+            v_list.append(v4)
+        
+        # read edge list
+        earrlen = bf.read("I")
+        half_earrlen = int(earrlen / 2)
+        
+        self.e_list = [[0,0] for i in range(half_earrlen)]
+        
+        earr = []            
+        for i in range(earrlen):
+            e = bf.read("I")
+            earr.append(e)
+        
+        for i in range(half_earrlen):                
+            self.e_list[i][0] = earr[i*2]
+            self.e_list[i][1] = earr[i*2 + 1]
+
+        # read face list
+        farrlen = bf.read("I")
+        half_farrlen = int(farrlen / 4)
+        
+        self.f_list = [[0,0, 0, 0] for i in range(half_farrlen)]
+        
+        farr = []
+        for i in range(farrlen):
+            f = bf.read("I")
+            farr.append(f)
+        
+        for i in range(half_farrlen):
+            self.f_list[i][0] = farr[i*4]
+            self.f_list[i][1] = farr[i*4 + 1]
+            self.f_list[i][2] = farr[i*4 + 2]
+            self.f_list[i][3] = farr[i*4 + 3]
+        
+   
+    
+    def write_file(self, filename):
+        print("-- write --")
+        with open(filename, "wb") as f:
+            bf = bfh.BinaryFile(f)
+            self.as_bytes(bf)
+    
+    def read_file4(self, filename):
+        print("-- read --")
+        with open(filename, "rb") as f:
+            bf = bfh.BinaryFile(f)
+            self.interpret_bytes(bf)
+            
 
 #==============================================================================
 # Generate 3d cube
@@ -123,6 +225,37 @@ def cube4d(v0,v1):
     polygon.e_list.append((14,1))
     polygon.e_list.append((1,15))
     polygon.e_list.append((15,13))
+
+    polygon.f_list.append((1,14,6,7))
+    polygon.f_list.append((6,2,3,7))
+    polygon.f_list.append((2,10,11,3))
+    polygon.f_list.append((10,14,1,11))
+
+    polygon.f_list.append((7,6,5,8))
+    polygon.f_list.append((3,2,0,4))
+    polygon.f_list.append((11,10,9,12))
+    polygon.f_list.append((1,14,13,15))
+
+    polygon.f_list.append((14,6,5,13))
+    polygon.f_list.append((6,2,0,5))
+    polygon.f_list.append((2,10,9,0))
+    polygon.f_list.append((10,14,13,9))
+
+    polygon.f_list.append((1,15,8,7))
+    polygon.f_list.append((8,4,3,7))
+    polygon.f_list.append((4,12,11,3))
+    polygon.f_list.append((12,15,1,11))
+
+    polygon.f_list.append((1,11,3,7))
+    polygon.f_list.append((14,6,2,10))
+    polygon.f_list.append((15,8,4,12))
+    polygon.f_list.append((13,5,0,9))
+
+    polygon.f_list.append((15,13,5,8))
+    polygon.f_list.append((5,8,4,0))
+    polygon.f_list.append((0,4,12,9))
+    polygon.f_list.append((13,9,12,15))
+
     return polygon
 
 #==============================================================================
@@ -138,3 +271,12 @@ def create_cube4d( point, size, color):
     c = cube4d(lower,higher)
     c.color = color
     return c
+
+
+if __name__ == "__main__":
+    
+    c4 = cube4d(vec.V4(-1, -1, -1, -1), vec.V4(1, 1, 1, 1))
+    
+    c4.write_file("./test_poly.poly")
+    
+    c4.read_file4("./test_poly.poly")
