@@ -191,11 +191,11 @@ class MainApp:
         # start the game engine
         self.game = g_eng.GameEngine()
 
-        # creates top menu
-        self.create_menu()
-
         # root frame of tkinter
         self.root = root
+
+        # creates top menu
+        self.create_menu()
 
         # score label
         self.score_str = StringVar()
