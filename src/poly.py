@@ -73,6 +73,7 @@ class Polygon:
             v4.interpret_bytes(bf)
             v_list.append(v4)
         
+        self.v_list = v_list
         # read edge list
         earrlen = bf.read("I")
         half_earrlen = int(earrlen / 2)

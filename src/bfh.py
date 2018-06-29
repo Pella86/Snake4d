@@ -87,8 +87,7 @@ class BinaryFile:
         strlen = self.read("I")
         
         b = self.file.read(strlen)
-        bs = struct.unpack("c"*strlen, b)
-        s = "".join([str(c) for c in bs])
+        s = str(b, "ascii")
         self.co += strlen
         return s
     
