@@ -9,6 +9,9 @@ To run the game just use
 
 ```python main.py```
 
+## Trailer - rendered in Blender3d
+https://youtu.be/M1nB-Q0JOBA
+
 ## How to play
 ![Instruction image](/images/Labelled_instructions.png)  
 
