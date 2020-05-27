@@ -12,9 +12,11 @@ sys.path.append("./src")
 # py imports
 import time
 import datetime
+import os
 
 # GUI stuff
-from tkinter import Tk, _tkinter, StringVar, Label, Menu, Toplevel
+from tkinter import (Tk, _tkinter, StringVar, Label, Menu, Toplevel, IntVar,
+                     Checkbutton, filedialog)
 
 # project imports
 import visu
@@ -151,6 +153,67 @@ class Rate:
             return True
         else:
             return False
+        
+# =============================================================================
+#  Replay settings
+# =============================================================================
+
+# define a switch that can be controlled if replay are saved or not
+
+# define a folder and a file name for the replay
+            
+class ReplaySettings:
+    
+    file = "./settings/replay.txt"
+    
+    def __init__(self):
+        self.record = False
+        self.path = ""
+        self.name = ""
+        
+        if os.path.isfile(self.file):
+            self.read()
+        
+        self.recordvar = IntVar()
+        self.recordvar.set(1 if self.record else 0)
+        
+            
+    def display(self, frame):
+        
+        # create a top level 
+        level = Toplevel(frame)
+        
+        # create a radio button for the recording
+        
+        checkbox = Checkbutton(level, text = "Record", variable = self.recordvar)
+        checkbox.pack()
+        
+        # add a box to chose the path and filename
+    
+    def read_state(self):
+        if self.recordvar.get() == 1:
+            current_record_state = True
+        else:
+            current_record_state = False
+            
+        if current_record_state != self.record:
+            self.record = current_record_state
+            self.save()
+        
+    def save(self):
+        with open(self.file, "w") as f:
+            f.write("record:" + str(self.record) + "\n")
+            f.write("path:" + self.path + "\n")
+            f.write("name:" + self.name + "\n")
+    
+    def read(self):
+        with open(self.file, "r") as f:
+            
+            lines = f.readlines()
+            
+        self.record = False if lines[0].split(":")[1].strip() == "False" else True
+        self.path = lines[1].split(":")[1].strip()
+        self.name = lines[2].split(":")[1].strip()
 
 #==============================================================================
 # Main Application
@@ -288,6 +351,10 @@ class MainApp:
 
         # the scores, which are saved in score.txt
         self.score_board = score.ScoreBoard(self.root)
+        
+        # creates the replay settings
+        self.replay_settings = ReplaySettings()
+        
 
     def create_menu(self):
         '''
@@ -296,6 +363,8 @@ class MainApp:
         File:
             New Game
             Quit
+        Replay:
+            Replay settings
         Help:
             Help
         '''
@@ -304,14 +373,23 @@ class MainApp:
         filemenu = Menu(menubar, tearoff=0)
         filemenu.add_command(label="New Game", command=lambda: self.new_game(1))
         filemenu.add_cascade(label="Quit", command=self.root.destroy)
+        
+        replaymenu = Menu(menubar, tearoff=0)
+        replaymenu.add_command(label="Replay settings", command=self.replay_settings)
 
         helpmenu = Menu(menubar, tearoff=0)
         helpmenu.add_command(label="Help", command=self.help_cmd)
 
         menubar.add_cascade(label="File", menu=filemenu)
+        menubar.add_cascade(label="Replay", menu =replaymenu)
         menubar.add_cascade(label="Help", menu=helpmenu)
 
+
         self.root.config(menu=menubar)
+    
+    def replay_settings(self):
+        # read the settings from a file
+        self.replay_settings.display(self.root)
 
     # controls the 4 dimensional rotation of the scenes
     def rot4(self, event):
@@ -432,6 +510,7 @@ class MainApp:
             if update_rate.is_time():
                 self.root.update_idletasks()
                 self.root.update()
+                self.replay_settings.read_state()
 
 # main program
 def main():
