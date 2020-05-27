@@ -16,7 +16,7 @@ import os
 
 # GUI stuff
 from tkinter import (Tk, _tkinter, StringVar, Label, Menu, Toplevel, IntVar,
-                     Checkbutton, filedialog)
+                     Checkbutton, filedialog, Button)
 
 # project imports
 import visu
@@ -189,6 +189,31 @@ class ReplaySettings:
         checkbox.pack()
         
         # add a box to chose the path and filename
+        # display the path and name of the current replay
+        bselect_path = Button(level, text= "Select path", command = self.select_path)
+        bselect_path.pack()
+    
+    def select_path(self):
+        initdir = self.path if self.path else "/"
+        title = "Name a new file"
+        extentions = (("snake4d files", ".sk4"),("all files", "*.*"))
+        path = filedialog.asksaveasfilename(initialdir=initdir,
+                                            title=title,
+                                            filetypes=extentions)
+        
+        # break the path down 
+        
+        pos = path.rfind("/")
+        
+        self.path = path[ : pos]
+        self.name = path[pos + 1 : ]
+        
+        if self.name.find(".sk4") == -1:
+            self.name += ".sk4"
+            
+        self.save()
+        
+        
     
     def read_state(self):
         if self.recordvar.get() == 1:
