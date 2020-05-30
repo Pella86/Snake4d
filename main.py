@@ -22,6 +22,7 @@ from tkinter import (Tk, _tkinter, StringVar, Label, Menu, Toplevel, IntVar,
 import visu
 import g_eng
 import score
+import bfh
 
 
 
@@ -168,7 +169,7 @@ class ReplaySettings:
     
     def __init__(self):
         self.record = False
-        self.path = ""
+        self.path = "."
         self.name = ""
         
         if os.path.isfile(self.file):
@@ -176,8 +177,7 @@ class ReplaySettings:
         
         self.recordvar = IntVar()
         self.recordvar.set(1 if self.record else 0)
-        
-            
+
     def display(self, frame):
         
         # create a top level 
@@ -212,6 +212,10 @@ class ReplaySettings:
             self.name += ".sk4"
             
         self.save()
+    
+    
+    def get_filename(self):
+        return os.path.join(self.path, self.name)
         
         
     
@@ -227,18 +231,23 @@ class ReplaySettings:
         
     def save(self):
         with open(self.file, "w") as f:
-            f.write("record:" + str(self.record) + "\n")
-            f.write("path:" + self.path + "\n")
-            f.write("name:" + self.name + "\n")
+            f.write("record=" + str(self.record) + "\n")
+            f.write("path=" + self.path + "\n")
+            f.write("name=" + self.name + "\n")
     
     def read(self):
         with open(self.file, "r") as f:
             
             lines = f.readlines()
             
-        self.record = False if lines[0].split(":")[1].strip() == "False" else True
-        self.path = lines[1].split(":")[1].strip()
-        self.name = lines[2].split(":")[1].strip()
+        self.record = False if lines[0].split("=")[1].strip() == "False" else True
+        self.path = lines[1].split("=")[1].strip()
+        self.name = lines[2].split("=")[1].strip()
+        
+        if not os.path.isdir(self.path):
+            self.path = "."
+            self.save()
+            
 
 #==============================================================================
 # Main Application
@@ -400,7 +409,7 @@ class MainApp:
         filemenu.add_cascade(label="Quit", command=self.root.destroy)
         
         replaymenu = Menu(menubar, tearoff=0)
-        replaymenu.add_command(label="Replay settings", command=self.replay_settings)
+        replaymenu.add_command(label="Replay settings", command=self.replay_settings_display)
 
         helpmenu = Menu(menubar, tearoff=0)
         helpmenu.add_command(label="Help", command=self.help_cmd)
@@ -412,7 +421,7 @@ class MainApp:
 
         self.root.config(menu=menubar)
     
-    def replay_settings(self):
+    def replay_settings_display(self):
         # read the settings from a file
         self.replay_settings.display(self.root)
 
@@ -483,6 +492,13 @@ class MainApp:
         
         game_frame_counter = 0
         
+        # reset the file
+        if self.replay_settings.record:
+            with open(self.replay_settings.get_filename(), "wb"):
+                pass
+        
+
+        
         while True:
 
             # drawing scenese
@@ -512,7 +528,13 @@ class MainApp:
                     self.game.routine()
                     
                     # writes the frames
-                    self.game.write_frame("./frames/frame_" + str(game_frame_counter) + ".sk4")
+                    
+                    if self.replay_settings.record:
+                        filename = self.replay_settings.get_filename()
+                        with open(filename, "ab") as fobj:
+                            replay_file = bfh.BinaryFile(fobj)
+                            self.game.frame_as_bytes(replay_file)
+                    
                     game_frame_counter += 1
 
                     # updates the score label

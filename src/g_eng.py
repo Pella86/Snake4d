@@ -11,7 +11,6 @@ import copy
 import snake
 import poly
 import vec
-import bfh
 
 #==============================================================================
 # Game Engine class
@@ -136,15 +135,11 @@ class GameEngine:
         self.evaluate_collision(c)
         self.generate_plist()
         
-    def write_frame(self, filename):
-        c_pol = 0
-        with open(filename, "wb") as f:
-            bf = bfh.BinaryFile(f)
-            bf.write("I", len(self.p_list))
-            for p in self.p_list:
-                p.as_bytes(bf)
-                c_pol += 1
-        print("written {} polyigons".format(c_pol))
+    def frame_as_bytes(self, bf):
+        
+        bf.write("I", len(self.p_list))
+        for p in self.p_list:
+            p.as_bytes(bf)
     
     def read_frame(self, filename):
         with open(filename, "rb") as f:
@@ -161,6 +156,11 @@ class GameEngine:
 if __name__ == "__main__":
     geng = GameEngine()
     geng.routine()
-
-    geng.write_frame("./frame_test.sk4") 
-    geng.read_frame("./frame_test.sk4")            
+    
+    import bfh
+    
+    with open("../tests/frame_test.sk4", "wb") as f:
+        bf = bfh.BinaryFile(f)
+        
+        geng.frame_as_bytes(bf)
+                  

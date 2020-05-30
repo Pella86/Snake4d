@@ -1,3 +1,3 @@
-record:True
-path:
-name:
+record=True
+path=
+name=.sk4
