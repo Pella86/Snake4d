@@ -285,10 +285,9 @@ class ReplaySettings:
 
 class LoadReplay:
     
-    def __init__(self, game):
+    def __init__(self):
         self.frames = []
         self.current_frame = 0
-        self.game = game
         
     def load_replay_file(self, filename):
         with open(filename, "rb") as f:
@@ -311,27 +310,25 @@ class LoadReplay:
                 self.frames.append(p_list)
             
             print("Frame loaded:", len(self.frames))
-        
-    def set_frame(self):
-        self.game.p_list = self.frames[self.current_frame]
     
     def next_frame(self):
         if self.current_frame + 1 < len(self.frames):
             self.current_frame += 1
-            self.set_frame()
+            return self.frames[self.current_frame]
             
     def previous_frame(self):
         if self.current_frame - 1 > 0:
             self.current_frame -= 1
-            self.set_frame()
-            
+            return self.frames[self.current_frame]            
 
 class Replay:
 
     def __init__(self, geng):
         self.replay_settings = ReplaySettings() 
         
-        self.replay = LoadReplay(geng)
+        self.replay = LoadReplay()
+        
+        self.game = geng
         
     
     def reset_replay_file(self):
@@ -364,7 +361,9 @@ class Replay:
         pass
     
     def fw(self):
-        self.replay.next_frame()
+        p_list = self.replay.next_frame()
+        if p_list:
+            self.game.p_list = p_list
         print("current_frame:", self.replay.current_frame)
         
     
@@ -521,6 +520,7 @@ class MainApp:
             Quit
         Replay:
             Replay settings
+            Load replay
         Help:
             Help
         '''
@@ -622,9 +622,7 @@ class MainApp:
         draw_rate = Rate(1 / 25.0)
         game_rate = Rate(1 / 2.0)
         update_rate = Rate(1 / 50.0)
-        
-        game_frame_counter = 0
-        
+
         # reset the file
         self.replay.reset_replay_file()
 
@@ -657,11 +655,8 @@ class MainApp:
 
                     self.game.routine()
                     
-                    # writes the frames
-                    
+                    # writes the frames if the record option is on
                     self.replay.save_replay_frame(self.game)
-                    
-                    game_frame_counter += 1
 
                     # updates the score label
                     self.score_str.set("Score: " + str(self.game.score))
