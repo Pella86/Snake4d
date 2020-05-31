@@ -141,16 +141,14 @@ class GameEngine:
         for p in self.p_list:
             p.as_bytes(bf)
     
-    def read_frame(self, filename):
-        with open(filename, "rb") as f:
-            bf = bfh.BinaryFile(f)
-            # read length
-            p_list_len = bf.read("I")
-            
-            self.p_list = [poly.Polygon() for i in range(p_list_len)]
-            
-            for p in self.p_list:
-                p.interpret_bytes(bf)
+    # def read_frame(self, bf):
+    #     p_list_len = bf.read("I")
+        
+    #     self.p_list = [poly.Polygon() for i in range(p_list_len)]
+        
+    #     for p in self.p_list:
+    #         p.interpret_bytes(bf)
+        
             
             
 if __name__ == "__main__":

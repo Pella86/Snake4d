@@ -23,6 +23,7 @@ import visu
 import g_eng
 import score
 import bfh
+import poly
 
 
 
@@ -165,18 +166,26 @@ class Rate:
             
 class ReplaySettings:
     
+    ''' The class manages the replay settings which are a check box for 
+    recording and a path to a file where the replay will get stored'''
+    
     file = "./settings/replay.txt"
     
     def __init__(self):
+        # Default values if the replay setting file doesn't exist
         self.record = False
         self.path = "."
         self.name = ""
         
+        # read the replay setting file
         if os.path.isfile(self.file):
             self.read()
         
+        # set up the variable bound to the check box
         self.recordvar = IntVar()
         self.recordvar.set(1 if self.record else 0)
+        
+        self.text_path = StringVar()
 
     def display(self, frame):
         
@@ -184,16 +193,39 @@ class ReplaySettings:
         level = Toplevel(frame)
         
         # create a radio button for the recording
-        
         checkbox = Checkbutton(level, text = "Record", variable = self.recordvar)
         checkbox.pack()
+        
+        # add a label with the path written
+        self.update_display_path()
+        
+        label_path = Label(level, textvariable=self.text_path)
+        label_path.pack()
         
         # add a box to chose the path and filename
         # display the path and name of the current replay
         bselect_path = Button(level, text= "Select path", command = self.select_path)
         bselect_path.pack()
+        
+    def update_display_path(self):
+        if self.name:
+            filename = self.get_filename().replace("\\", "/")
+        else:
+            filename = "path not set"
+            
+        max_displayed_chars = 23
+        cover_symbol = "..."
+        truncate_chars = max_displayed_chars - len(cover_symbol)
+        
+        if len(filename) >= max_displayed_chars:
+            beginning = filename[:truncate_chars]
+            ending = filename[len(filename)-truncate_chars:]
+            filename = beginning + cover_symbol + ending
+
+        self.text_path.set(filename)
     
     def select_path(self):
+        
         initdir = self.path if self.path else "/"
         title = "Name a new file"
         extentions = (("snake4d files", ".sk4"),("all files", "*.*"))
@@ -201,17 +233,20 @@ class ReplaySettings:
                                             title=title,
                                             filetypes=extentions)
         
-        # break the path down 
-        
-        pos = path.rfind("/")
-        
-        self.path = path[ : pos]
-        self.name = path[pos + 1 : ]
-        
-        if self.name.find(".sk4") == -1:
-            self.name += ".sk4"
+        if path:
+            # break the path down 
             
-        self.save()
+            pos = path.rfind("/")
+            
+            self.path = path[ : pos]
+            self.name = path[pos + 1 : ]
+            
+            if self.name.find(".sk4") == -1:
+                self.name += ".sk4"
+                
+            self.save()
+            
+            self.update_display_path()
     
     
     def get_filename(self):
@@ -247,7 +282,92 @@ class ReplaySettings:
         if not os.path.isdir(self.path):
             self.path = "."
             self.save()
+
+class LoadReplay:
+    
+    def __init__(self, game):
+        self.frames = []
+        self.current_frame = 0
+        self.game = game
+        
+    def load_replay_file(self, filename):
+        with open(filename, "rb") as f:
+            bf = bfh.BinaryFile(f)
             
+            n_bytes = len(f.read())
+            
+            print("File size:", n_bytes)
+            
+            while bf.co < n_bytes:
+            
+                # read frame
+                p_list_len = bf.read("I")
+                
+                p_list = [poly.Polygon() for i in range(p_list_len)]
+        
+                for p in p_list:
+                    p.interpret_bytes(bf)
+            
+                self.frames.append(p_list)
+            
+            print("Frame loaded:", len(self.frames))
+        
+    def set_frame(self):
+        self.game.p_list = self.frames[self.current_frame]
+    
+    def next_frame(self):
+        if self.current_frame + 1 < len(self.frames):
+            self.current_frame += 1
+            self.set_frame()
+            
+    def previous_frame(self):
+        if self.current_frame - 1 > 0:
+            self.current_frame -= 1
+            self.set_frame()
+            
+
+class Replay:
+
+    def __init__(self, geng):
+        self.replay_settings = ReplaySettings() 
+        
+        self.replay = LoadReplay(geng)
+        
+    
+    def reset_replay_file(self):
+        with open(self.replay_settings.get_filename(), "wb") as f:
+            f.write(b"")        
+    
+    def save_replay_frame(self, geng):        
+        if self.replay_settings.record:
+            filename = self.replay_settings.get_filename()
+            with open(filename, "ab") as fobj:
+                replay_file = bfh.BinaryFile(fobj)
+                geng.frame_as_bytes(replay_file)    
+    
+    def load_replay(self, filename):
+        # add a top level to manage the replay
+        
+        toplevel = Toplevel()
+        
+        # add buttons allback back play/pause forward allfw
+        
+        b_all_back = Button(toplevel, text="|<", command=self.all_back)
+        b_all_back.pack()
+        
+        b_fw = Button(toplevel, text=">", command=self.fw)
+        b_fw.pack()
+        
+        self.replay.load_replay_file(filename)
+  
+    def all_back(self):
+        pass
+    
+    def fw(self):
+        self.replay.next_frame()
+        print("current_frame:", self.replay.current_frame)
+        
+    
 
 #==============================================================================
 # Main Application
@@ -387,7 +507,9 @@ class MainApp:
         self.score_board = score.ScoreBoard(self.root)
         
         # creates the replay settings
-        self.replay_settings = ReplaySettings()
+        #self.replay_settings = ReplaySettings()
+        
+        self.replay = Replay(self.game)
         
 
     def create_menu(self):
@@ -410,7 +532,8 @@ class MainApp:
         
         replaymenu = Menu(menubar, tearoff=0)
         replaymenu.add_command(label="Replay settings", command=self.replay_settings_display)
-
+        replaymenu.add_command(label="Load replay", command=self.load_replay)
+        
         helpmenu = Menu(menubar, tearoff=0)
         helpmenu.add_command(label="Help", command=self.help_cmd)
 
@@ -420,6 +543,16 @@ class MainApp:
 
 
         self.root.config(menu=menubar)
+    
+    def load_replay(self):
+        initdir= "./tests"
+        filename = filedialog.askopenfilename(initialdir=initdir)
+        
+        self.paused = True
+
+        self.replay.load_replay(filename)
+        
+        
     
     def replay_settings_display(self):
         # read the settings from a file
@@ -493,10 +626,7 @@ class MainApp:
         game_frame_counter = 0
         
         # reset the file
-        if self.replay_settings.record:
-            with open(self.replay_settings.get_filename(), "wb"):
-                pass
-        
+        self.replay.reset_replay_file()
 
         
         while True:
@@ -529,11 +659,7 @@ class MainApp:
                     
                     # writes the frames
                     
-                    if self.replay_settings.record:
-                        filename = self.replay_settings.get_filename()
-                        with open(filename, "ab") as fobj:
-                            replay_file = bfh.BinaryFile(fobj)
-                            self.game.frame_as_bytes(replay_file)
+                    self.replay.save_replay_frame(self.game)
                     
                     game_frame_counter += 1
 
@@ -557,7 +683,7 @@ class MainApp:
             if update_rate.is_time():
                 self.root.update_idletasks()
                 self.root.update()
-                self.replay_settings.read_state()
+                self.replay.replay_settings.read_state()
 
 # main program
 def main():
