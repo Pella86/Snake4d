@@ -19,6 +19,16 @@ import vec
 
 class GameEngine:
     
+    collision_none = 0
+    collision_outbbox = 1
+    collision_food = 2
+    collision_snake = 3
+    
+    gamestate_game_over = 0
+    gamestate_run = 1
+    
+    
+    
     def __init__(self):
         # creates a snake, which is positioned in the center and with 4 
         # segments in the -x direction
@@ -33,7 +43,7 @@ class GameEngine:
         self.food = self.initialize_food()
         
         # game state
-        self.state = "run"
+        self.state = self.gamestate_run
         
         # score (sum of the cubes)
         self.score = 0
@@ -102,28 +112,28 @@ class GameEngine:
         
         # if is outside of the bbox
         if not self.intersect(self.snake.head_pos, ext_bbox):
-            return "out_bbox"
+            return self.collision_outbbox
         
         # if the snake got food
         if self.intersect(self.snake.head_pos, self.food):
-            return "food"
+            return self.collision_food
         
         # if the snake crosses itself
         for p in self.snake.p_list[:-1]:
             if self.intersect(self.snake.head_pos, p):
-                return "snake"
+                return self.collision_snake
             
         # else no collisions
-        return "none"
+        return self.collision_none
     
     def evaluate_collision(self, collision):
         # decide what to do in case of collision
         
         # out of bounding box or collision with itself will make a game over
-        if collision == "out_bbox" or collision == "snake":
-            self.state = "game_over"
+        if collision == self.collision_outbbox or collision == self.collision_snake:
+            self.state = self.gamestate_game_over
             
-        elif collision == "food":
+        elif collision == self.collision_food:
             self.snake.add_segment()
             self.food = self.initialize_food()
             self.score += 1
@@ -141,13 +151,6 @@ class GameEngine:
         for p in self.p_list:
             p.as_bytes(bf)
     
-    # def read_frame(self, bf):
-    #     p_list_len = bf.read("I")
-        
-    #     self.p_list = [poly.Polygon() for i in range(p_list_len)]
-        
-    #     for p in self.p_list:
-    #         p.interpret_bytes(bf)
         
             
             

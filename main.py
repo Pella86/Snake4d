@@ -186,7 +186,7 @@ class MainApp:
         # 4d rotations mapping
         rot4_keys = list(keys) + list(keys.upper())
         for key in rot4_keys:
-            self.root.bind(key, self.rot)yyyy
+            self.root.bind(key, self.rot)
 
         # creates a dictionary that maps the key pressed to set of angles
         rot_to_angle = {}
@@ -245,7 +245,7 @@ class MainApp:
 
     def replay_settings_display(self):
         # read the settings from a file
-        self.replay_settings.display(self.root)
+        self.replay.replay_settings.display(self.root)
     
     # controls the rotations in response to a key press
     def rot(self, event):
@@ -261,11 +261,11 @@ class MainApp:
         
         if rotation:
             self.areas[0].project_method.rotate4(rotation)
-        
-        # else the key must be a 3d rotation
-        rotation = self.rot3k_to_angle[event.char]
-        
-        self.areas[0].project_method.rotate3(rotation)
+        else:
+            # else the key must be a 3d rotation
+            rotation = self.rot3k_to_angle[event.char]
+            
+            self.areas[0].project_method.rotate3(rotation)
 
     # shows the help board
     def help_cmd(self):
@@ -283,7 +283,7 @@ class MainApp:
     # pause toggle
     def toggle_pause(self, event):
         # the pause works only if the game is running
-        if self.game.state != "game_over":
+        if self.game.state != g_eng.GameEngine.gamestate_game_over:
             if self.paused:
                 self.paused = False
                 self.areas[0].clear_text()
@@ -314,7 +314,7 @@ class MainApp:
         update_rate = rate.Rate(1 / 50.0)
         replay_rate = rate.Rate(1 / 2.0)
 
-        # reset the file
+        # reset the replay file overwriting it with a empty byte string
         self.replay.reset_replay_file()
 
         
@@ -330,7 +330,7 @@ class MainApp:
             # game stuff
             if  game_rate.is_time():
 
-                if self.paused or self.game.state == "game_over":
+                if self.paused or self.game.state == g_eng.GameEngine.gamestate_game_over:
                     pass
                 else:
                     # clears annoying text
@@ -357,7 +357,7 @@ class MainApp:
 
                     # if the games ends in a game over, then show the top score
                     # board
-                    if self.game.state == "game_over":
+                    if self.game.state == g_eng.GameEngine.gamestate_game_over:
                         self.areas[0].add_text("Game Over\nPress space for new game")
 
                         # create new score
