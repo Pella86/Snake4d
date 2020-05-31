@@ -12,18 +12,15 @@ sys.path.append("./src")
 # py imports
 import time
 import datetime
-import os
 
 # GUI stuff
-from tkinter import (Tk, _tkinter, StringVar, Label, Menu, Toplevel, IntVar,
-                     Checkbutton, filedialog, Button)
+from tkinter import (Tk, _tkinter, StringVar, Label, Menu, Toplevel, filedialog)
 
 # project imports
 import visu
 import g_eng
 import score
-import bfh
-import poly
+import replay
 
 
 
@@ -156,216 +153,7 @@ class Rate:
         else:
             return False
         
-# =============================================================================
-#  Replay settings
-# =============================================================================
 
-# define a switch that can be controlled if replay are saved or not
-
-# define a folder and a file name for the replay
-            
-class ReplaySettings:
-    
-    ''' The class manages the replay settings which are a check box for 
-    recording and a path to a file where the replay will get stored'''
-    
-    file = "./settings/replay.txt"
-    
-    def __init__(self):
-        # Default values if the replay setting file doesn't exist
-        self.record = False
-        self.path = "."
-        self.name = ""
-        
-        # read the replay setting file
-        if os.path.isfile(self.file):
-            self.read()
-        
-        # set up the variable bound to the check box
-        self.recordvar = IntVar()
-        self.recordvar.set(1 if self.record else 0)
-        
-        self.text_path = StringVar()
-
-    def display(self, frame):
-        
-        # create a top level 
-        level = Toplevel(frame)
-        
-        # create a radio button for the recording
-        checkbox = Checkbutton(level, text = "Record", variable = self.recordvar)
-        checkbox.pack()
-        
-        # add a label with the path written
-        self.update_display_path()
-        
-        label_path = Label(level, textvariable=self.text_path)
-        label_path.pack()
-        
-        # add a box to chose the path and filename
-        # display the path and name of the current replay
-        bselect_path = Button(level, text= "Select path", command = self.select_path)
-        bselect_path.pack()
-        
-    def update_display_path(self):
-        if self.name:
-            filename = self.get_filename().replace("\\", "/")
-        else:
-            filename = "path not set"
-            
-        max_displayed_chars = 23
-        cover_symbol = "..."
-        truncate_chars = max_displayed_chars - len(cover_symbol)
-        
-        if len(filename) >= max_displayed_chars:
-            beginning = filename[:truncate_chars]
-            ending = filename[len(filename)-truncate_chars:]
-            filename = beginning + cover_symbol + ending
-
-        self.text_path.set(filename)
-    
-    def select_path(self):
-        
-        initdir = self.path if self.path else "/"
-        title = "Name a new file"
-        extentions = (("snake4d files", ".sk4"),("all files", "*.*"))
-        path = filedialog.asksaveasfilename(initialdir=initdir,
-                                            title=title,
-                                            filetypes=extentions)
-        
-        if path:
-            # break the path down 
-            
-            pos = path.rfind("/")
-            
-            self.path = path[ : pos]
-            self.name = path[pos + 1 : ]
-            
-            if self.name.find(".sk4") == -1:
-                self.name += ".sk4"
-                
-            self.save()
-            
-            self.update_display_path()
-    
-    
-    def get_filename(self):
-        return os.path.join(self.path, self.name)
-        
-        
-    
-    def read_state(self):
-        if self.recordvar.get() == 1:
-            current_record_state = True
-        else:
-            current_record_state = False
-            
-        if current_record_state != self.record:
-            self.record = current_record_state
-            self.save()
-        
-    def save(self):
-        with open(self.file, "w") as f:
-            f.write("record=" + str(self.record) + "\n")
-            f.write("path=" + self.path + "\n")
-            f.write("name=" + self.name + "\n")
-    
-    def read(self):
-        with open(self.file, "r") as f:
-            
-            lines = f.readlines()
-            
-        self.record = False if lines[0].split("=")[1].strip() == "False" else True
-        self.path = lines[1].split("=")[1].strip()
-        self.name = lines[2].split("=")[1].strip()
-        
-        if not os.path.isdir(self.path):
-            self.path = "."
-            self.save()
-
-class LoadReplay:
-    
-    def __init__(self):
-        self.frames = []
-        self.current_frame = 0
-        
-    def load_replay_file(self, filename):
-        with open(filename, "rb") as f:
-            bf = bfh.BinaryFile(f)
-            
-            n_bytes = len(f.read())
-            
-            print("File size:", n_bytes)
-            
-            while bf.co < n_bytes:
-            
-                # read frame
-                p_list_len = bf.read("I")
-                
-                p_list = [poly.Polygon() for i in range(p_list_len)]
-        
-                for p in p_list:
-                    p.interpret_bytes(bf)
-            
-                self.frames.append(p_list)
-            
-            print("Frame loaded:", len(self.frames))
-    
-    def next_frame(self):
-        if self.current_frame + 1 < len(self.frames):
-            self.current_frame += 1
-            return self.frames[self.current_frame]
-            
-    def previous_frame(self):
-        if self.current_frame - 1 > 0:
-            self.current_frame -= 1
-            return self.frames[self.current_frame]            
-
-class Replay:
-
-    def __init__(self, geng):
-        self.replay_settings = ReplaySettings() 
-        
-        self.replay = LoadReplay()
-        
-        self.game = geng
-        
-    
-    def reset_replay_file(self):
-        with open(self.replay_settings.get_filename(), "wb") as f:
-            f.write(b"")        
-    
-    def save_replay_frame(self, geng):        
-        if self.replay_settings.record:
-            filename = self.replay_settings.get_filename()
-            with open(filename, "ab") as fobj:
-                replay_file = bfh.BinaryFile(fobj)
-                geng.frame_as_bytes(replay_file)    
-    
-    def load_replay(self, filename):
-        # add a top level to manage the replay
-        
-        toplevel = Toplevel()
-        
-        # add buttons allback back play/pause forward allfw
-        
-        b_all_back = Button(toplevel, text="|<", command=self.all_back)
-        b_all_back.pack()
-        
-        b_fw = Button(toplevel, text=">", command=self.fw)
-        b_fw.pack()
-        
-        self.replay.load_replay_file(filename)
-  
-    def all_back(self):
-        pass
-    
-    def fw(self):
-        p_list = self.replay.next_frame()
-        if p_list:
-            self.game.p_list = p_list
-        print("current_frame:", self.replay.current_frame)
-        
     
 
 #==============================================================================
@@ -508,7 +296,7 @@ class MainApp:
         # creates the replay settings
         #self.replay_settings = ReplaySettings()
         
-        self.replay = Replay(self.game)
+        self.replay = replay.Replay(self.game)
         
 
     def create_menu(self):
@@ -551,9 +339,7 @@ class MainApp:
         self.paused = True
 
         self.replay.load_replay(filename)
-        
-        
-    
+
     def replay_settings_display(self):
         # read the settings from a file
         self.replay_settings.display(self.root)
@@ -622,12 +408,16 @@ class MainApp:
         draw_rate = Rate(1 / 25.0)
         game_rate = Rate(1 / 2.0)
         update_rate = Rate(1 / 50.0)
+        replay_rate = Rate(1 / 2.0)
 
         # reset the file
         self.replay.reset_replay_file()
 
         
         while True:
+            
+            if replay_rate.is_time():
+                self.replay.play_frames()
 
             # drawing scenese
             if draw_rate.is_time():
