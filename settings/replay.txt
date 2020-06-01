@@ -1,3 +1,2 @@
 record=True
 path=C:/Users/Media Markt/Desktop/Vita Online/Programming/Snake4d/tests
-name=omgis8mb.sk4

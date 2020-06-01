@@ -30,12 +30,12 @@ class ReplaySettings:
     recording and a path to a file where the replay will get stored'''
     
     file = "./settings/replay.txt"
+    tmp_replay_file = "./settings/_tmp_replay_file.sk4"
     
     def __init__(self):
         # Default values if the replay setting file doesn't exist
         self.record = False
-        self.path = "."
-        self.name = ""
+        self.previous_path = ""
         
         # read the replay setting file
         if os.path.isfile(self.file):
@@ -44,8 +44,6 @@ class ReplaySettings:
         # set up the variable bound to the check box
         self.recordvar = IntVar()
         self.recordvar.set(1 if self.record else 0)
-        
-        self.text_path = StringVar()
 
     def display(self, frame):
         
@@ -56,44 +54,13 @@ class ReplaySettings:
         checkbox = Checkbutton(level, text = "Record", variable = self.recordvar)
         checkbox.pack()
         
-        # add a label with the path written
-        self.update_display_path()
+    
         
-        label_path = Label(level, textvariable=self.text_path)
-        label_path.pack()
-        
-        # add a box to chose the path and filename
-        # display the path and name of the current replay
-        bselect_path = Button(level, text= "Select path", command = self.select_path)
-        bselect_path.pack()
-        
-    def update_display_path(self):
-        ''' Updates the label that has the path, it slices the path so that 
-        more parts are visibile'''
-        
-        # if the path is not chosen yet show path not set
-        if self.name:
-            filename = self.get_filename().replace("\\", "/")
-        else:
-            filename = "path not set"
-        
-        # display max 23 characters included "..." in the middle if the
-        # path is too long
-        max_displayed_chars = 23
-        cover_symbol = "..."
-        truncate_chars = max_displayed_chars - len(cover_symbol)
-        
-        if len(filename) >= max_displayed_chars:
-            beginning = filename[:truncate_chars]
-            ending = filename[len(filename)-truncate_chars:]
-            filename = beginning + cover_symbol + ending
-
-        self.text_path.set(filename)
     
     def select_path(self):
         ''' Prompt the user to select a path '''
         
-        initdir = self.path if self.path else "/"
+        initdir = self.previous_path if self.previous_path else "/"
         title = "Name a new file"
         extentions = (("snake4d files", ".sk4"),("all files", "*.*"))
         path = filedialog.asksaveasfilename(initialdir=initdir,
@@ -102,26 +69,17 @@ class ReplaySettings:
         
         if path:
             # break the path down 
-            
             pos = path.rfind("/")
             
-            self.path = path[ : pos]
-            self.name = path[pos + 1 : ]
-            
-            if not self.name:
-                return
-            
-            if self.name.find(".sk4") == -1:
-                self.name += ".sk4"
+            self.previous_path = path[ : pos]
+            name = path[pos + 1 : ]
+            if name[::-1][0:4] != ".sk4"[::-1]:
+                name += ".sk4"
                 
             self.save()
             
-            self.update_display_path()
+            return os.path.join(self.previous_path, name)
     
-    
-    def get_filename(self):
-        ''' This function composes the filename from the path and the name'''
-        return os.path.join(self.path, self.name)
 
     def read_state(self):
         ''' This function reads the check box and updates the settings 
@@ -140,8 +98,7 @@ class ReplaySettings:
         ''' saves the setting file overwriting it'''
         with open(self.file, "w") as f:
             f.write("record=" + str(self.record) + "\n")
-            f.write("path=" + self.path + "\n")
-            f.write("name=" + self.name + "\n")
+            f.write("path=" + self.previous_path + "\n")
     
     def read(self):
         ''' reads the setting file '''
@@ -149,10 +106,9 @@ class ReplaySettings:
             lines = f.readlines()
             
         self.record = False if lines[0].split("=")[1].strip() == "False" else True
-        self.path = lines[1].split("=")[1].strip()
-        self.name = lines[2].split("=")[1].strip()
+        self.previous_path = lines[1].split("=")[1].strip()
         
-        if not os.path.isdir(self.path):
+        if not os.path.isdir(self.previous_path):
             self.path = "."
             self.save()
 
@@ -225,14 +181,14 @@ class Replay:
     def reset_replay_file(self):
         # resets the replay file... it should change because more often than
         # not overwrites replays
-        with open(self.replay_settings.get_filename(), "wb") as f:
+        with open(self.replay_settings.tmp_replay_file, "wb") as f:
             f.write(b"")        
     
     def save_replay_frame(self, geng):   
         # At the update game engine tick this function will append a frame
         # to the file
         if self.replay_settings.record:
-            filename = self.replay_settings.get_filename()
+            filename = self.replay_settings.tmp_replay_file
             with open(filename, "ab") as fobj:
                 replay_file = bfh.BinaryFile(fobj)
                 geng.frame_as_bytes(replay_file)    
@@ -264,6 +220,7 @@ class Replay:
         
         
         self.replay.load_replay_file(filename)
+    
     
     def set_plist(self, p_list):
         if p_list:

@@ -11,6 +11,7 @@ sys.path.append("./src")
 
 # py imports
 import datetime
+import shutil
 
 # GUI stuff
 from tkinter import (Tk, _tkinter, StringVar, Label, Menu, Toplevel, filedialog)
@@ -28,8 +29,6 @@ import rate
 # # TO DO list
 #==============================================================================
 
-# Refactor collisions
-# Comment/Refactor rotation messs
 # Create a blender folder and blender file to render the stuff
 # Think about a better way to do the replay
 
@@ -177,29 +176,6 @@ class MainApp:
         #self.replay_settings = ReplaySettings()
         
         self.replay = replay.Replay(self.game)
-    
-    def set_rotation_keys(self, keys):
-        
-        n_rot = len(keys)
-        angle_delta = 5 # degrees
-        
-        # 4d rotations mapping
-        rot4_keys = list(keys) + list(keys.upper())
-        for key in rot4_keys:
-            self.root.bind(key, self.rot)
-
-        # creates a dictionary that maps the key pressed to set of angles
-        rot_to_angle = {}
-
-        for i, k in enumerate(rot4_keys):
-            # set the rotations to 0
-            possible_rots = [0 for i in range(n_rot)]
-            
-            # assign the angle to the relevant rotation
-            possible_rots[i % n_rot] = angle_delta if k.islower() else -angle_delta
-            rot_to_angle[k] = possible_rots
-
-        return rot_to_angle
         
 
     def create_menu(self):
@@ -223,6 +199,7 @@ class MainApp:
         
         replaymenu = Menu(menubar, tearoff=0)
         replaymenu.add_command(label="Replay settings", command=self.replay_settings_display)
+        replaymenu.add_command(label="Save replay", command=self.save_replay)
         replaymenu.add_command(label="Load replay", command=self.load_replay)
         
         helpmenu = Menu(menubar, tearoff=0)
@@ -238,14 +215,46 @@ class MainApp:
     def load_replay(self):
         initdir= "./tests"
         filename = filedialog.askopenfilename(initialdir=initdir)
+        if filename:
+            self.paused = True
+            self.replay.load_replay(filename)
+    
+    def save_replay(self):
+        filename = self.replay.replay_settings.select_path()
         
-        self.paused = True
-
-        self.replay.load_replay(filename)
+        # copy the temp replay to a new filename
+        src = self.replay.replay_settings.tmp_replay_file
+        shutil.copy(src, filename)
+        
 
     def replay_settings_display(self):
         # read the settings from a file
         self.replay.replay_settings.display(self.root)
+
+    # binds the rotation keys to the function and set how big is the rotation
+    def set_rotation_keys(self, keys): 
+        n_rot = len(keys)
+        angle_delta = 5 # degrees
+        
+        # rotations mapping
+        rot_keys = list(keys) + list(keys.upper())
+        for key in rot_keys:
+            self.root.bind(key, self.rot)
+
+        # creates a dictionary that maps the key pressed to set of angles
+        # if the key is capital (shift+key) it will have a negative rotation
+        rot_to_angle = {}
+
+        for i, k in enumerate(rot_keys):
+            # set the rotations to 0
+            possible_rots = [0 for i in range(n_rot)]
+            
+            # assign the angle to the relevant rotation
+            possible_rots[i % n_rot] = angle_delta if k.islower() else -angle_delta
+            rot_to_angle[k] = possible_rots
+
+        return rot_to_angle
+
     
     # controls the rotations in response to a key press
     def rot(self, event):
