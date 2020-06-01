@@ -5,9 +5,9 @@ Created on Thu May 17 13:20:44 2018
 @author: Mauro
 """
 
-# import sys to access the src folder
 import sys
-sys.path.append("./src")
+if "./src" not in sys.path:
+    sys.path.append("./src")
 
 # py imports
 import datetime
