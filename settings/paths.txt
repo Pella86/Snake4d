@@ -1,0 +1,2 @@
+save_dir=C:/Users/Media Markt/Desktop/Vita Online/Programming/Snake4d/tests
+load_path=C:/Users/Media Markt/Desktop/Vita Online/Programming/Snake4d/tests

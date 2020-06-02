@@ -8,6 +8,28 @@ Created on Mon Jun  1 19:18:01 2020
 import bfh
 import poly
 
+def str_file_size(size):
+    
+    # Size limits in bytes 
+    limits = [1, 1e3, 1e6, 1e9, 1e12]
+    
+    # Corresponding letters
+    letters = ["", "K", "M", "G", "T"]
+    
+    # Fuse the two and invert the list
+    sizes = list(zip(limits, letters))[::-1]
+    
+    # start from the bigger till one finds an appropriate limit
+    for limit, letter in sizes:
+        v = size / limit
+        if v >= 1:
+            v = size / limit
+            if letter:
+                return f"{v:.1f} {letter}b"
+            else:
+                v = int(v)
+                return f"{v} b"
+
 
 class LoadReplay:
     ''' This class loads a replay file'''
@@ -25,7 +47,7 @@ class LoadReplay:
             
             n_bytes = len(f.read())
             
-            print("File size:", n_bytes)
+            print("Replay file size:", str_file_size(n_bytes))
             
             while bf.co < n_bytes:
             

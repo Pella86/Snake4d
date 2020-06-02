@@ -15,6 +15,8 @@ from tkinter import (IntVar, StringVar, Toplevel, Checkbutton, Button,
 
 import bfh
 import load_replay
+import rem_path
+        
 
 # =============================================================================
 #  Replay settings
@@ -35,7 +37,7 @@ class ReplaySettings:
     def __init__(self):
         # Default values if the replay setting file doesn't exist
         self.record = False
-        self.previous_path = ""
+        self.previous_directory = rem_path.RememberPath("save_dir", "/")
         
         # read the replay setting file
         if os.path.isfile(self.file):
@@ -53,14 +55,11 @@ class ReplaySettings:
         # create a radio button for the recording
         checkbox = Checkbutton(level, text = "Record", variable = self.recordvar)
         checkbox.pack()
-        
-    
-        
-    
+
     def select_path(self):
         ''' Prompt the user to select a path '''
         
-        initdir = self.previous_path if self.previous_path else "/"
+        initdir = self.previous_directory.get()
         title = "Name a new file"
         extentions = (("snake4d files", ".sk4"),("all files", "*.*"))
         path = filedialog.asksaveasfilename(initialdir=initdir,
@@ -71,14 +70,14 @@ class ReplaySettings:
             # break the path down 
             pos = path.rfind("/")
             
-            self.previous_path = path[ : pos]
+            self.previous_directory.assign(path[ : pos])
+            
             name = path[pos + 1 : ]
+            # check if the extention was added, if it wasnt, add the extention
             if name[::-1][0:4] != ".sk4"[::-1]:
                 name += ".sk4"
-                
-            self.save()
             
-            return os.path.join(self.previous_path, name)
+            return os.path.join(self.previous_directory.get(), name)
     
 
     def read_state(self):
@@ -98,7 +97,6 @@ class ReplaySettings:
         ''' saves the setting file overwriting it'''
         with open(self.file, "w") as f:
             f.write("record=" + str(self.record) + "\n")
-            f.write("path=" + self.previous_path + "\n")
     
     def read(self):
         ''' reads the setting file '''
@@ -106,12 +104,7 @@ class ReplaySettings:
             lines = f.readlines()
             
         self.record = False if lines[0].split("=")[1].strip() == "False" else True
-        self.previous_path = lines[1].split("=")[1].strip()
         
-        if not os.path.isdir(self.previous_path):
-            self.path = "."
-            self.save()
-
 class Replay:
     ''' The class manages the loading and saving replays '''
     
@@ -214,4 +207,5 @@ class Replay:
                 p_list = self.replay.next_frame_wrap()
                 self.set_plist(p_list)
         
-        
+
+

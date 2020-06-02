@@ -23,6 +23,7 @@ import score
 import replay
 import keybuf
 import rate
+import rem_path
 
 
 #==============================================================================
@@ -176,6 +177,7 @@ class MainApp:
         #self.replay_settings = ReplaySettings()
         
         self.replay = replay.Replay(self.game)
+        self.load_path = rem_path.RememberPath("load_path", "/")
         
 
     def create_menu(self):
@@ -213,18 +215,25 @@ class MainApp:
         self.root.config(menu=menubar)
     
     def load_replay(self):
-        initdir= "./tests"
+        initdir= self.load_path.get()
         filename = filedialog.askopenfilename(initialdir=initdir)
+        
+        
         if filename:
+            pos = filename.rfind("/")
+            
+            self.load_path.assign(filename[ : pos])
+            
             self.paused = True
+            
             self.replay.load_replay(filename)
     
     def save_replay(self):
         filename = self.replay.replay_settings.select_path()
-        
-        # copy the temp replay to a new filename
-        src = self.replay.replay_settings.tmp_replay_file
-        shutil.copy(src, filename)
+        if filename:
+            # copy the temp replay to a new filename
+            src = self.replay.replay_settings.tmp_replay_file
+            shutil.copy(src, filename)
         
 
     def replay_settings_display(self):

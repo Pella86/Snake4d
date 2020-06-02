@@ -132,7 +132,7 @@ for game_frame in range(25):
 #        cam4.change_position(rotv)
 
         p_list = replay.get_frame()
-        replay.next_frame()
+        
         
         
         #print("read game_frame...", game_frame)
@@ -145,6 +145,7 @@ for game_frame in range(25):
             visibility(ob, ani_frame, ani_frame)
         
         angle += math.radians(1.44)
+    replay.next_frame()
 
 
 # read all frames
