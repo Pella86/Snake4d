@@ -1,0 +1,2 @@
+init_dir_save=./save
+init_dir_load=./load

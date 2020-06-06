@@ -5,29 +5,37 @@ Created on Thu May 17 13:20:44 2018
 @author: Mauro
 """
 
-# import sys to access the src folder
+# =============================================================================
+# Imports
+# =============================================================================
+
 import sys
-sys.path.append("./src")
+if "./src" not in sys.path:
+    sys.path.append("./src")
 
 # py imports
-import time
 import datetime
+import shutil
 
 # GUI stuff
-from tkinter import Tk, _tkinter, StringVar, Label, Menu, Toplevel
+from tkinter import (Tk, _tkinter, StringVar, Label, Menu, Toplevel, filedialog,
+                     messagebox)
 
 # project imports
 import visu
 import g_eng
 import score
-
+import replay
+import keybuf
+import rate
+import rem_path
 
 
 #==============================================================================
 # # TO DO list
 #==============================================================================
 
-# insert a option to save the files
+# Think about a better way to do the replay
 
 #==============================================================================
 # Help message
@@ -59,98 +67,6 @@ To control the CAMERA use:             \n
   V, B, N, M, T or Z to control 4d     \n
   rotations                            \n
 **********************************************\n'''
-
-#==============================================================================
-# Key buffer
-#==============================================================================
-
-class KeyBuffer:
-    '''
-    Key Buffer
-
-    is a simple buffer that keeps track of the key pressed while playing
-    it makes a more fluid control of the snake when the game lags.
-
-    Methods:
-        __init__
-        push_key
-        get_key
-        clear
-
-    Instance variables:
-        self.buf -- a simple list doing the job of a LIFO stack
-        self.key_to_dir -- transforms the key in directions
-    '''
-
-    def __init__(self):
-        '''
-        class is initialised with a buffer, and a dictionary that will
-        convert the keys to directions
-        '''
-
-        self.buf = []
-
-        # construct the dictionary that changes the snake direction
-        self.key_to_dir = {}
-        bind_key = ["w", "s", "a", "d", "i", "k", "j", "l"]
-        possible_dirs = ["UP", "DOWN", "LEFT", "RIGHT", "FW", "RW", "IN", "OUT"]
-
-        for direction, key in zip(possible_dirs, bind_key):
-            self.key_to_dir[key] = direction
-
-    def push_key(self, key):
-        '''
-        insert the key in the buffer
-
-        Keyword arguments:
-        key -- can be any character
-        '''
-
-        self.buf.append(key)
-
-    def get_key(self):
-        '''gets the next key, if none is found returns None'''
-
-        if self.buf:
-            return self.key_to_dir[self.buf.pop(0)]
-        else:
-            return None
-
-    def clear(self):
-        '''Just empties the buffer'''
-
-        self.buf = []
-
-#==============================================================================
-# Rate class
-#   for update rate, fps, ...
-#==============================================================================
-
-class Rate:
-    '''
-    Rate
-
-    small class to manage fps and various update rates
-    '''
-
-    def __init__(self, rate):
-        '''Initialize the rate calling for the time function
-
-        Keyword argument:
-        rate -- is a float representing 1/s frame rate
-        '''
-
-        self.rate = rate
-        self.init_time = time.time()
-
-    def is_time(self):
-        '''Returns true if the current time surpasses the rate'''
-
-        if time.time() - self.init_time > self.rate:
-            self.init_time = time.time()
-            return True
-        else:
-            return False
 
 #==============================================================================
 # Main Application
@@ -185,6 +101,7 @@ class MainApp:
         self.key_buffer -- the keys buffer
         self.paused -- the game state paused or not
         self.score_board -- the score display utilites
+        self.replay -- manages the replay
     '''
 
     def __init__(self, root):
@@ -241,40 +158,13 @@ class MainApp:
         # scene rotations - both + and - roations are supported, pressing x
         # will rotate the scene in a direction and pressing X (shift+x) will
         # rotate backwards in respect to that direction
-
-        # 3d rotations mapping
-        rot3_keys_str = "xyc"
-        rot3_keys = list(rot3_keys_str) + list(rot3_keys_str.upper())
-        for key in rot3_keys:
-            self.root.bind(key, self.rot3)
-        # creates a diction that maps the key pressed to a set of angles
-        self.rot3k_to_angle = {}
-
-        rot_keys = rot3_keys_str + rot3_keys_str.upper()
-        for i, k in enumerate(rot_keys):
-            possible_rots = [0 for i in range(3)]
-            possible_rots[i % 3] = 5 if i < 3 else -5
-            self.rot3k_to_angle[k] = possible_rots
-
-        # 4d rotations mapping
-        rot4_keys_str = "vbnmtz"
-        rot4_keys = list(rot4_keys_str) + list(rot4_keys_str.upper())
-        for key in rot4_keys:
-            self.root.bind(key, self.rot4)
-
-        # creates a dictionary from key pressed to set of angles
-
-        self.rot4k_to_angle = {}
-
-        rot_keys = rot4_keys_str + rot4_keys_str.upper()
-        for i, k in enumerate(rot_keys):
-            possible_rots = [0 for i in range(6)]
-            possible_rots[i % 6] = 5 if i < 6 else -5
-            self.rot4k_to_angle[k] = possible_rots
-
+        # x, y, c: 3d rotations
+        # v, b, n, m, t, z: 4d rotations
+        self.rot3k_to_angle = self.set_rotation_keys("xyc")
+        self.rot4k_to_angle = self.set_rotation_keys("vbnmtz")
 
         # the buffered key press
-        self.key_buffer = KeyBuffer()
+        self.key_buffer = keybuf.KeyBuffer()
 
         # pause function
         self.paused = True
@@ -288,6 +178,11 @@ class MainApp:
 
         # the scores, which are saved in score.txt
         self.score_board = score.ScoreBoard(self.root)
+        
+        # creates the replay settings
+        self.replay = replay.Replay(self.game)
+        
+        
 
     def create_menu(self):
         '''
@@ -296,6 +191,10 @@ class MainApp:
         File:
             New Game
             Quit
+        Replay:
+            Replay settings
+            Save replay
+            Load replay
         Help:
             Help
         '''
@@ -304,33 +203,92 @@ class MainApp:
         filemenu = Menu(menubar, tearoff=0)
         filemenu.add_command(label="New Game", command=lambda: self.new_game(1))
         filemenu.add_cascade(label="Quit", command=self.root.destroy)
-
+        
+        replaymenu = Menu(menubar, tearoff=0)
+        replaymenu.add_command(label="Replay settings", command=self.replay_settings_display)
+        replaymenu.add_command(label="Save replay", command=self.save_replay)
+        replaymenu.add_command(label="Load replay", command=self.load_replay)
+        
         helpmenu = Menu(menubar, tearoff=0)
         helpmenu.add_command(label="Help", command=self.help_cmd)
 
         menubar.add_cascade(label="File", menu=filemenu)
+        menubar.add_cascade(label="Replay", menu =replaymenu)
         menubar.add_cascade(label="Help", menu=helpmenu)
 
         self.root.config(menu=menubar)
+    
+    def load_replay(self):
+        filename = self.replay.select_load_path()
+        
+        if filename:
+            self.replay.reset_replay_file()
+            
+            self.paused = True
+            
+            self.replay.load_replay(filename)
+    
+    def save_replay(self):
+        
+        if self.replay.tmp_replay_file_is_empty():
+            messagebox.showwarning(title= "No replay file",
+                                   message="The replay file is empty\nis the record setting off?")
+        else:    
+            filename = self.replay.select_save_path()
+            
+            if filename:
+                # copy the temp replay to a new filename
+                src = self.replay.tmp_replay_file
+                shutil.copy(src, filename)
+        
+    def replay_settings_display(self):
+        # Displays the replay settings, which are the record checkbox
+        self.replay.replay_settings.display(self.root)
 
-    # controls the 4 dimensional rotation of the scenes
-    def rot4(self, event):
-        # if pressed clear the annoying instruction text
+    # binds the rotation keys to the function and set how big is the rotation
+    def set_rotation_keys(self, keys): 
+        n_rot = len(keys)
+        angle_delta = 5 # degrees
+        
+        # rotations mapping
+        rot_keys = list(keys) + list(keys.upper())
+        for key in rot_keys:
+            self.root.bind(key, self.rot)
+
+        # creates a dictionary that maps the key pressed to set of angles
+        # if the key is capital (shift+key) it will have a negative rotation
+        rot_to_angle = {}
+
+        for i, k in enumerate(rot_keys):
+            # set the rotations to 0
+            possible_rots = [0 for i in range(n_rot)]
+            
+            # assign the angle to the relevant rotation
+            possible_rots[i % n_rot] = angle_delta if k.islower() else -angle_delta
+            rot_to_angle[k] = possible_rots
+
+        return rot_to_angle
+
+    
+    # controls the rotations in response to a key press
+    def rot(self, event):
+         # if pressed clear the annoying instruction text
         self.areas[0].clear_text()
-
+        
         # perform the camera rotations only in the perspective one
         # in the others, doesn't make sense
-        rangles = self.rot4k_to_angle[event.char]
-        self.areas[0].project_method.rotate4(rangles)
-
-    # controls the 3 dimensional rotation of the scenes
-    def rot3(self, event):
-        # clear annoying text
-        self.areas[0].clear_text()
-
-        # perform the rotation
-        rangles = self.rot3k_to_angle[event.char]
-        self.areas[0].project_method.rotate3(rangles)
+        
+        # if the key pressed is in the 4d rotations
+        # if the key is a 3d rotation the get function will return None
+        rotation = self.rot4k_to_angle.get(event.char)
+        
+        if rotation:
+            self.areas[0].project_method.rotate4(rotation)
+        else:
+            # else the key must be a 3d rotation
+            rotation = self.rot3k_to_angle[event.char]
+            
+            self.areas[0].project_method.rotate3(rotation)
 
     # shows the help board
     def help_cmd(self):
@@ -348,7 +306,7 @@ class MainApp:
     # pause toggle
     def toggle_pause(self, event):
         # the pause works only if the game is running
-        if self.game.state != "game_over":
+        if self.game.state != g_eng.GameEngine.gamestate_game_over:
             if self.paused:
                 self.paused = False
                 self.areas[0].clear_text()
@@ -374,11 +332,19 @@ class MainApp:
     def updater(self):
 
         # rates of update
-        draw_rate = Rate(1 / 25.0)
-        game_rate = Rate(1 / 2.0)
-        update_rate = Rate(1 / 50.0)
+        draw_rate = rate.Rate(1 / 25.0)
+        game_rate = rate.Rate(1 / 2.0)
+        update_rate = rate.Rate(1 / 50.0)
+        replay_rate = rate.Rate(1 / 2.0)
 
+        # reset the replay file overwriting it with a empty byte string
+        self.replay.reset_replay_file()
+
+        
         while True:
+            
+            if replay_rate.is_time():
+                self.replay.play_frames()
 
             # drawing scenese
             if draw_rate.is_time():
@@ -387,7 +353,7 @@ class MainApp:
             # game stuff
             if  game_rate.is_time():
 
-                if self.paused or self.game.state == "game_over":
+                if self.paused or self.game.state == g_eng.GameEngine.gamestate_game_over:
                     pass
                 else:
                     # clears annoying text
@@ -405,13 +371,16 @@ class MainApp:
                         self.game.snake.change_dir(next_dir)
 
                     self.game.routine()
+                    
+                    # writes the frames if the record option is on
+                    self.replay.save_replay_frame(self.game)
 
                     # updates the score label
                     self.score_str.set("Score: " + str(self.game.score))
 
                     # if the games ends in a game over, then show the top score
                     # board
-                    if self.game.state == "game_over":
+                    if self.game.state == g_eng.GameEngine.gamestate_game_over:
                         self.areas[0].add_text("Game Over\nPress space for new game")
 
                         # create new score
@@ -426,6 +395,9 @@ class MainApp:
             if update_rate.is_time():
                 self.root.update_idletasks()
                 self.root.update()
+                
+                # updates the checkbox
+                self.replay.replay_settings.read_state()
 
 # main program
 def main():

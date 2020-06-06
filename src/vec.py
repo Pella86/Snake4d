@@ -11,9 +11,21 @@ Created on Wed May 16 22:37:10 2018
 
 import math
 
+import bfh
+
+#==============================================================================
+# Constants
+#==============================================================================
+
 # is close constant
 epsilon = 0.00000001
 
+#==============================================================================
+# Helpers
+#==============================================================================
+
+
+        
 #==============================================================================
 # Errors
 #==============================================================================
@@ -28,12 +40,15 @@ class VecExcept(Exception):
 class Vector:
     
     def __init__(self, dimensions, coords = None):
-        if coords is None:
-            self.coords = [0 for i in range(dimensions)]
+        if isinstance(dimensions, str):
+            self.read_file(dimensions)
         else:
-            self.coords = coords
-            
-        self.dimension = dimensions
+            if coords is None:
+                self.coords = [0 for i in range(dimensions)]
+            else:
+                self.coords = coords
+                
+            self.dimension = dimensions
     
     # setter and getter
     def __getitem__(self, i):
@@ -147,7 +162,29 @@ class Vector:
             s += "{:.5g}".format(c) + ":"
         s = s[:-1] + ")"
         return s
+    
+    def as_bytes(self, bf):
+        bf.write("I", self.dimension)
+        for c in self.coords:
+            bf.write("d", c)
+    
+    def interpret_bytes(self, bf):
+        self.dimension = bf.read('I')
+        
+        self.coords = [0 for i in range(self.dimension)]
+        for i in range(self.dimension):
+            self.coords[i] = bf.read('d')   
 
+    def write_file(self, filename):
+        with open(filename, "wb") as f:
+            # save dimenstions
+            bf = bfh.BinaryFile(f)
+            self.as_bytes(bf)
+    
+    def read_file(self, filename):
+        with open(filename, "rb") as f:
+            bf = bfh.BinaryFile(f)
+            self.interpret_bytes(bf)
 #==============================================================================
 # 2d vector
 #==============================================================================
@@ -158,6 +195,8 @@ class V2(Vector):
 
         if y is None and type(x) is list:
             super().__init__(2, x)
+        elif y is None and type(x) is str:
+            super().__init__(x)
         else:
             super().__init__(2)
             self.coords[0] = x
@@ -179,6 +218,8 @@ class V3(Vector):
 
         if y is None and z is None and type(x) is list:
             super().__init__(3, x)      
+        elif y is None and type(x) is str:
+            super().__init__(x)
         else:
             super().__init__(3)
             self.coords[0] = x
@@ -210,6 +251,8 @@ class V4(Vector):
     def __init__(self, x, y = None, z = None, w = None):
         if type(x) is list and y is None and z is None and w is None:
             super().__init__(4, x)         
+        elif y is None and type(x) is str:
+            super().__init__(x)
         else:
             super().__init__(4)
             self.coords[0] = x
@@ -247,52 +290,61 @@ class V4(Vector):
 
 
 if __name__ == "__main__":
-    print("vector math utilites")
+#    print("vector math utilites")
+#    
+#    print("------- 2d -------")
+#    
+#    va = V2(0, 1)
+#    print("va:", va)
+#    
+#    vb = V2(1, 0)
+#    print("vb:", vb)
+#    
+#    vc = va + vb
+#    print("sum:", vc)
+#    
+#    print("------- 3d -------")
+#    
+#    va = V3(0, 0, 1)
+#    print("va:", va)
+#    print("angle to x axis:", math.degrees(va.angle(V3(1, 0, 0))))
+#    
+#    vb = V3(1, 0, 1)
+#    print("vb:", vb)
+#    
+#    vc = (va + vb) / 2
+#    print("mean:", vc)
+#    
+#    print("mag:", vc.magnitude())
+#    print("dot:", vc.dot(va))
+#    
+#    print("cross:", vc.cross(va))
+#
+#     
+#    v2 = V2(1, 0)
+#    v3 = V3(1, 0, 0)
+#    
+#    try:
+#        v = v2 + v3
+#    except VecExcept as e:
+#        print(e)
+#        
+#    print("------- 4d -------")
+#
+#    a = V4(4, 1, 2, 3)
+#    b = V4(3, 2, 1, 1)
+#    c = V4(1, 2, 3, 2)
+#    
+#    print("cross 4:", a.cross(b, c).normalize())
     
-    print("------- 2d -------")
+    v4 = V4(1.2, 1.5, 1.6, 2042104.2)
     
-    va = V2(0, 1)
-    print("va:", va)
+    print("--- write ---")
+    v4.write_file("./test_vector.vec")
     
-    vb = V2(1, 0)
-    print("vb:", vb)
-    
-    vc = va + vb
-    print("sum:", vc)
-    
-    print("------- 3d -------")
-    
-    va = V3(0, 0, 1)
-    print("va:", va)
-    print("angle to x axis:", math.degrees(va.angle(V3(1, 0, 0))))
-    
-    vb = V3(1, 0, 1)
-    print("vb:", vb)
-    
-    vc = (va + vb) / 2
-    print("mean:", vc)
-    
-    print("mag:", vc.magnitude())
-    print("dot:", vc.dot(va))
-    
-    print("cross:", vc.cross(va))
-
-     
-    v2 = V2(1, 0)
-    v3 = V3(1, 0, 0)
-    
-    try:
-        v = v2 + v3
-    except VecExcept as e:
-        print(e)
-        
-    print("------- 4d -------")
-
-    a = V4(4, 1, 2, 3)
-    b = V4(3, 2, 1, 1)
-    c = V4(1, 2, 3, 2)
-    
-    print("cross 4:", a.cross(b, c).normalize())
+    print("--- read ---")
+    v4read = V4("./test_vector.vec")
+    print(v4read)
     
     
     

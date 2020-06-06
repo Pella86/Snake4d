@@ -5,9 +5,12 @@ Created on Tue May 22 22:15:01 2018
 @author: Mauro
 """
 
-import snake, poly, vec
 import random
 import copy
+
+import snake
+import poly
+import vec
 
 #==============================================================================
 # Game Engine class
@@ -15,6 +18,16 @@ import copy
 #==============================================================================
 
 class GameEngine:
+    
+    collision_none = 0
+    collision_outbbox = 1
+    collision_food = 2
+    collision_snake = 3
+    
+    gamestate_game_over = 0
+    gamestate_run = 1
+    
+    
     
     def __init__(self):
         # creates a snake, which is positioned in the center and with 4 
@@ -30,7 +43,7 @@ class GameEngine:
         self.food = self.initialize_food()
         
         # game state
-        self.state = "run"
+        self.state = self.gamestate_run
         
         # score (sum of the cubes)
         self.score = 0
@@ -99,34 +112,32 @@ class GameEngine:
         
         # if is outside of the bbox
         if not self.intersect(self.snake.head_pos, ext_bbox):
-            return "out_bbox"
+            return self.collision_outbbox
         
         # if the snake got food
         if self.intersect(self.snake.head_pos, self.food):
-            return "food"
+            return self.collision_food
         
         # if the snake crosses itself
         for p in self.snake.p_list[:-1]:
             if self.intersect(self.snake.head_pos, p):
-                return "snake"
+                return self.collision_snake
             
         # else no collisions
-        return "none"
+        return self.collision_none
     
     def evaluate_collision(self, collision):
         # decide what to do in case of collision
         
         # out of bounding box or collision with itself will make a game over
-        if collision == "out_bbox" or collision == "snake":
-            self.state = "game_over"
+        if collision == self.collision_outbbox or collision == self.collision_snake:
+            self.state = self.gamestate_game_over
             
-        elif collision == "food":
+        elif collision == self.collision_food:
             self.snake.add_segment()
             self.food = self.initialize_food()
             self.score += 1
-    
-    
-        
+
     def routine(self):
         # the game routine, checks the collision which will "move" the snake
         # evaluates it and generates the new plist
@@ -134,5 +145,23 @@ class GameEngine:
         self.evaluate_collision(c)
         self.generate_plist()
         
+    def frame_as_bytes(self, bf):
+        
+        bf.write("I", len(self.p_list))
+        for p in self.p_list:
+            p.as_bytes(bf)
+    
         
             
+            
+if __name__ == "__main__":
+    geng = GameEngine()
+    geng.routine()
+    
+    import bfh
+    
+    with open("../tests/frame_test.sk4", "wb") as f:
+        bf = bfh.BinaryFile(f)
+        
+        geng.frame_as_bytes(bf)
+                  

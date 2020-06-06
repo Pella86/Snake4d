@@ -1,1 +1,4 @@
 __pycache__/
+frames/
+blender/outputs/
+tests/
