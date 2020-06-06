@@ -181,7 +181,7 @@ class MainApp:
         
         # creates the replay settings
         self.replay = replay.Replay(self.game)
-        self.load_path = rem_path.RememberPath("load_path", "/")
+        
         
 
     def create_menu(self):
@@ -219,33 +219,26 @@ class MainApp:
         self.root.config(menu=menubar)
     
     def load_replay(self):
-        initdir= self.load_path.get()
-        filename = filedialog.askopenfilename(initialdir=initdir)
-        
-        self.replay.reset_replay_file()
-        
+        filename = self.replay.select_load_path()
         
         if filename:
-            pos = filename.rfind("/")
-            
-            self.load_path.assign(filename[ : pos])
+            self.replay.reset_replay_file()
             
             self.paused = True
             
             self.replay.load_replay(filename)
     
     def save_replay(self):
-        with open(self.replay.replay_settings.tmp_replay_file, "rb") as f:
-            nbytes = len(f.read())
         
-        if nbytes == 0:
+        if self.replay.tmp_replay_file_is_empty():
             messagebox.showwarning(title= "No replay file",
                                    message="The replay file is empty\nis the record setting off?")
         else:    
-            filename = self.replay.replay_settings.select_path()
+            filename = self.replay.select_save_path()
+            
             if filename:
                 # copy the temp replay to a new filename
-                src = self.replay.replay_settings.tmp_replay_file
+                src = self.replay.tmp_replay_file
                 shutil.copy(src, filename)
         
     def replay_settings_display(self):

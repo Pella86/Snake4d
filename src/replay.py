@@ -29,12 +29,11 @@ class ReplaySettings:
     recording and a path to a file where the replay will get stored'''
     
     file = "./settings/replay.txt"
-    tmp_replay_file = "./settings/_tmp_replay_file.sk4"
     
     def __init__(self):
         # Default values if the replay setting file doesn't exist
         self.record = False
-        self.previous_directory = rem_path.RememberPath("save_dir", "/")
+
         
         # read the replay setting file
         if os.path.isfile(self.file):
@@ -53,28 +52,7 @@ class ReplaySettings:
         checkbox = Checkbutton(level, text = "Record", variable = self.recordvar)
         checkbox.pack()
 
-    def select_path(self):
-        ''' Prompt the user to select a path '''
-        
-        initdir = self.previous_directory.get()
-        title = "Name a new file"
-        extentions = (("snake4d files", ".sk4"),("all files", "*.*"))
-        path = filedialog.asksaveasfilename(initialdir=initdir,
-                                            title=title,
-                                            filetypes=extentions)
-        
-        if path:
-            # break the path down 
-            pos = path.rfind("/")
-            
-            self.previous_directory.assign(path[ : pos])
-            
-            name = path[pos + 1 : ]
-            # check if the extention was added, if it wasnt, add the extention
-            if name[::-1][0:4] != ".sk4"[::-1]:
-                name += ".sk4"
-            
-            return os.path.join(self.previous_directory.get(), name)
+
     
 
     def read_state(self):
@@ -105,6 +83,8 @@ class ReplaySettings:
 class Replay:
     ''' The class manages the loading and saving replays '''
     
+    tmp_replay_file = "./settings/_tmp_replay_file.sk4"
+    
     def __init__(self, geng):
         self.replay_settings = ReplaySettings() 
         
@@ -115,18 +95,55 @@ class Replay:
         self.play_state = False
        
         self.str_play = StringVar()
+        
+        self.previous_save_dir = rem_path.RememberPath("save_dir", "/")
+        self.previous_load_dir = rem_path.RememberPath("load_path", "/")
+    
+    def elaborate_path(self, path, previous_directory):
+        pos = path.rfind("/")
+        
+        previous_directory.assign(path[ : pos])
+        
+        name = path[pos + 1 : ]
+        # check if the extention was added, if it wasnt, add the extention
+        if name[::-1][0:4] != ".sk4"[::-1]:
+            name += ".sk4"
+        
+        return os.path.join(previous_directory.get(), name)
+    
+    def select_save_path(self):
+        ''' Prompt the user to select a path '''
+        
+        initdir = self.previous_save_dir.get()
+        title = "Name a new file"
+        extentions = (("snake4d files", ".sk4"),("all files", "*.*"))
+        pathname = filedialog.asksaveasfilename(initialdir=initdir,
+                                            title=title,
+                                            filetypes=extentions)
+        
+        if pathname:
+            
+            return self.elaborate_path(pathname, self.previous_save_dir)
+    
+    def select_load_path(self):
+        initdir = self.previous_load_dir.get()
+        pathname = filedialog.askopenfilename(initialdir=initdir)
+        
+        if pathname:
+            return self.elaborate_path(pathname, self.previous_load_dir)
+
     
     def reset_replay_file(self):
         # resets the replay file... it should change because more often than
         # not overwrites replays
-        with open(self.replay_settings.tmp_replay_file, "wb") as f:
+        with open(self.tmp_replay_file, "wb") as f:
             f.write(b"")        
     
     def save_replay_frame(self, geng):   
         # At the update game engine tick this function will append a frame
         # to the file
         if self.replay_settings.record:
-            filename = self.replay_settings.tmp_replay_file
+            filename = self.tmp_replay_file
             with open(filename, "ab") as fobj:
                 replay_file = bfh.BinaryFile(fobj)
                 geng.frame_as_bytes(replay_file)    
@@ -145,7 +162,7 @@ class Replay:
         b_back.grid(row=0, column=1)
         
        
-        self.str_play.set("play" if self.play_state else "pause")
+        self.str_play.set("pause" if self.play_state else "play")
         
         b_play = Button(toplevel, textvariable=self.str_play, command=self.play)
         b_play.grid(row=0, column=2)
@@ -159,6 +176,10 @@ class Replay:
         
         self.replay.load_replay_file(filename)
     
+    def tmp_replay_file_is_empty(self):
+        with open(self.tmp_replay_file, "rb") as f:
+            nbytes = len(f.read())    
+        return nbytes == 0
     
     def set_plist(self, p_list):
         if p_list:
@@ -182,7 +203,7 @@ class Replay:
         else:
             self.play_state = True
         
-        self.str_play.set("play" if self.play_state else "pause")
+        self.str_play.set("pause" if self.play_state else "play")
         
     
     def fw(self):
