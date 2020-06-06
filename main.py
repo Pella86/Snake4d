@@ -5,6 +5,10 @@ Created on Thu May 17 13:20:44 2018
 @author: Mauro
 """
 
+# =============================================================================
+# Imports
+# =============================================================================
+
 import sys
 if "./src" not in sys.path:
     sys.path.append("./src")
@@ -14,7 +18,8 @@ import datetime
 import shutil
 
 # GUI stuff
-from tkinter import (Tk, _tkinter, StringVar, Label, Menu, Toplevel, filedialog)
+from tkinter import (Tk, _tkinter, StringVar, Label, Menu, Toplevel, filedialog,
+                     messagebox)
 
 # project imports
 import visu
@@ -30,7 +35,6 @@ import rem_path
 # # TO DO list
 #==============================================================================
 
-# Create a blender folder and blender file to render the stuff
 # Think about a better way to do the replay
 
 #==============================================================================
@@ -154,6 +158,8 @@ class MainApp:
         # scene rotations - both + and - roations are supported, pressing x
         # will rotate the scene in a direction and pressing X (shift+x) will
         # rotate backwards in respect to that direction
+        # x, y, c: 3d rotations
+        # v, b, n, m, t, z: 4d rotations
         self.rot3k_to_angle = self.set_rotation_keys("xyc")
         self.rot4k_to_angle = self.set_rotation_keys("vbnmtz")
 
@@ -174,8 +180,6 @@ class MainApp:
         self.score_board = score.ScoreBoard(self.root)
         
         # creates the replay settings
-        #self.replay_settings = ReplaySettings()
-        
         self.replay = replay.Replay(self.game)
         self.load_path = rem_path.RememberPath("load_path", "/")
         
@@ -189,6 +193,7 @@ class MainApp:
             Quit
         Replay:
             Replay settings
+            Save replay
             Load replay
         Help:
             Help
@@ -211,12 +216,13 @@ class MainApp:
         menubar.add_cascade(label="Replay", menu =replaymenu)
         menubar.add_cascade(label="Help", menu=helpmenu)
 
-
         self.root.config(menu=menubar)
     
     def load_replay(self):
         initdir= self.load_path.get()
         filename = filedialog.askopenfilename(initialdir=initdir)
+        
+        self.replay.reset_replay_file()
         
         
         if filename:
@@ -229,15 +235,21 @@ class MainApp:
             self.replay.load_replay(filename)
     
     def save_replay(self):
-        filename = self.replay.replay_settings.select_path()
-        if filename:
-            # copy the temp replay to a new filename
-            src = self.replay.replay_settings.tmp_replay_file
-            shutil.copy(src, filename)
+        with open(self.replay.replay_settings.tmp_replay_file, "rb") as f:
+            nbytes = len(f.read())
         
-
+        if nbytes == 0:
+            messagebox.showwarning(title= "No replay file",
+                                   message="The replay file is empty\nis the record setting off?")
+        else:    
+            filename = self.replay.replay_settings.select_path()
+            if filename:
+                # copy the temp replay to a new filename
+                src = self.replay.replay_settings.tmp_replay_file
+                shutil.copy(src, filename)
+        
     def replay_settings_display(self):
-        # read the settings from a file
+        # Displays the replay settings, which are the record checkbox
         self.replay.replay_settings.display(self.root)
 
     # binds the rotation keys to the function and set how big is the rotation
@@ -390,6 +402,8 @@ class MainApp:
             if update_rate.is_time():
                 self.root.update_idletasks()
                 self.root.update()
+                
+                # updates the checkbox
                 self.replay.replay_settings.read_state()
 
 # main program

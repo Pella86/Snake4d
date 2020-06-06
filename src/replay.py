@@ -9,22 +9,19 @@ Created on Sun May 31 20:53:24 2020
 # Imports
 # =============================================================================
 
+# py imports
 import os
 from tkinter import (IntVar, StringVar, Toplevel, Checkbutton, Button, 
                      filedialog)
 
+# project imports
 import bfh
 import load_replay
 import rem_path
         
-
 # =============================================================================
 #  Replay settings
 # =============================================================================
-
-# define a switch that can be controlled if replay are saved or not
-
-# define a folder and a file name for the replay
             
 class ReplaySettings:
     

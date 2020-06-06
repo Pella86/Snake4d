@@ -1,2 +1,1 @@
-record=False
-path=C:/Users/Media Markt/Desktop/Vita Online/Programming/Snake4d/tests
+record=True
