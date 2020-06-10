@@ -2,3 +2,5 @@ __pycache__/
 frames/
 blender/outputs/
 tests/
+settings/scores.txt
+settings/scores_previous.txt
