@@ -13,9 +13,13 @@ import math, vec
 import copy
 
 class Q(vec.V4):
+    ''' Quaternion class '''
     
-    # possibly change in Q(x,y,z,w) or Q(s, v)
     def __init__(self, w, x, y = None, z = None):
+        ''' The quaternion defined as Q with scalar s and vector (i, j, k) gets
+        mapped to a V4 (x, y, z, w) so that s is w, i, j, k are x, y, z
+        '''
+        # possibly change in Q(x,y,z,w) or Q(s, v)
         
         # if the first argument is a vector
         if isinstance(x, vec.V3):
@@ -25,14 +29,14 @@ class Q(vec.V4):
 
         super().__init__(x, y, z, w)
     
-    # inverse of the quaternion
     def qi(self):
+        ''' conjugate of the quaternion '''
         for i in range(0, self.dimension - 1):
             self.coords[i] = -self.coords[i]
         return self
     
-    # cross product
     def cross(self, q2):
+        ''' cross product between quaternions '''
         s1 = self.w()
         s2 = q2.w()
 
@@ -45,8 +49,8 @@ class Q(vec.V4):
 
         return Q(s3, v3)
     
-    # hamilton multiplication
     def hamilton(self, q):
+        ''' hamilton multiplication '''
         a1 = self.w()
         a2 = q.w()
         
@@ -65,14 +69,17 @@ class Q(vec.V4):
         z = a1 * d2 + b1 * c2 - c1 * b2 + d1 * a2
         
         return Q(w, x, y, z)
-    
-    # get the vector part of the quaternion
+  
     def get_vector(self):
+        '''get the vector part of the quaternion'''
         return vec.V3(self.x(), self.y(), self.z())
         
     
 def rot_around_axis(point, axis, angle):
+    ''' function that rotates a point around a given axis '''
+    
     axis.normalize()
+    
     # construct the quaternion
     s = math.cos(angle / 2)
     v = axis * math.sin(angle /2)

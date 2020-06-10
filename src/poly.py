@@ -5,11 +5,12 @@ Created on Thu May 17 15:34:47 2018
 @author: Mauro
 """
 
-import copy
+# =============================================================================
+# Imports
+# =============================================================================
 
 import vec
 import bfh
-
 
 #==============================================================================
 # Polygon class
@@ -17,6 +18,8 @@ import bfh
 #==============================================================================
 
 class Polygon:
+    '''The polygon class has the methods to write itself in a binary file'''
+    
     def __init__(self):
         self.v_list = []
         self.e_list = []
@@ -24,28 +27,34 @@ class Polygon:
         self.color = "red"
     
     def as_bytes(self, bf):
+        ''' writes the polygon '''
+        
+        # write the color at the beginning
         bf.write_string(self.color)
         
         # write vertex list
-        
         bf.write("I", len(self.v_list))
         
         for v in self.v_list:
             v.as_bytes(bf)
         
         # write edge list
-        
+            
+        # first transform it in a linear array
         earr = []
         for e in self.e_list:
             earr.append(e[0])
             earr.append(e[1])
         
+        # write that array
         earrlen = len(earr)
         bf.write("I", earrlen)
         for e in earr:
             bf.write("I", e)
         
         # write face list
+
+        # transform it in a linear array
         farr = []
         for f in self.f_list:
             farr.append(f[0])
@@ -53,6 +62,7 @@ class Polygon:
             farr.append(f[2])
             farr.append(f[3])
         
+        # then write it
         farrlen = len(farr)
         bf.write("I", farrlen)
         for f in farr:
@@ -63,9 +73,8 @@ class Polygon:
         self.color = bf.read_string()
         
         # read vertex list
-        v_list = []
         
-        # read len
+        v_list = []
         v_len = bf.read("I")
         
         for i in range(v_len):
@@ -74,32 +83,46 @@ class Polygon:
             v_list.append(v4)
         
         self.v_list = v_list
+        
         # read edge list
         earrlen = bf.read("I")
-        half_earrlen = int(earrlen / 2)
         
-        self.e_list = [[0,0] for i in range(half_earrlen)]
-        
+        # read in the linear array containg the values
         earr = []            
         for i in range(earrlen):
             e = bf.read("I")
             earr.append(e)
+
+        # the array is composed of a series of couples (0 1)(2 3)
+        # which indicates which vertex are connected
+        half_earrlen = int(earrlen / 2)
         
+        # initialize the edge list with 0s
+        self.e_list = [[0,0] for i in range(half_earrlen)]
+        
+        # assign those values to the initialized edge list
         for i in range(half_earrlen):                
             self.e_list[i][0] = earr[i*2]
             self.e_list[i][1] = earr[i*2 + 1]
 
         # read face list
         farrlen = bf.read("I")
-        half_farrlen = int(farrlen / 4)
         
-        self.f_list = [[0,0, 0, 0] for i in range(half_farrlen)]
-        
+        # read the linear array containgin the vertex indexes that compose a 
+        # face
         farr = []
         for i in range(farrlen):
             f = bf.read("I")
             farr.append(f)
+
+        # the array is composed of a series of couples (0 1 2 3)(5 6 7 8)
+        # which indicates which vertex form a face
+        half_farrlen = int(farrlen / 4)
         
+        # initialize the list
+        self.f_list = [[0, 0, 0, 0] for i in range(half_farrlen)]
+
+        # assign the values read to the face list        
         for i in range(half_farrlen):
             self.f_list[i][0] = farr[i*4]
             self.f_list[i][1] = farr[i*4 + 1]

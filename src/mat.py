@@ -16,6 +16,17 @@ class MatExcept(Exception):
 
 # class
 class Matrix:
+    ''' MxN matrix class
+    - can be initializated with aa nested list or with sizes
+    - item setters and getters throw MathException
+    - implemented:
+        - operator +
+        - operator -
+        - operator *
+    - can multy by scalar
+    - can be transposed
+    - cam be printed
+    '''
     
     def __init__(self, m, n = None):
         # store matrix in a linear vector
@@ -78,9 +89,9 @@ class Matrix:
             return mnew
             
         else:
-            raise MatExcept("Matrix: addition not same size")
+            raise MatExcept("Matrix: addition matrices not same size")
     
-    # operator - element wise
+    # operator - elementwise
     def __sub__(self, m2):
         if self.m == m2.m and self.n == m2.n:
             new_mat = []
@@ -92,7 +103,7 @@ class Matrix:
             return mnew
             
         else:
-            raise MatExcept("Matrix: subtraction not same size") 
+            raise MatExcept("Matrix: subtraction matrices not same size") 
     
     # matrix multiplication
     def __mul__(self, m2):
@@ -104,7 +115,7 @@ class Matrix:
                         mulmat[i, j] += self[i, m] * m2[m, j]
             return mulmat       
         else:
-            raise MatExcept("Matrix: multiplication columns diff then rows")
+            raise MatExcept("Matrix: multiplication matrix columns different then other matrix rows")
     
     def scalar(self, k):
         mat_new = []
@@ -188,22 +199,37 @@ class SquareMatrix(Matrix):
         return imatrix
 
 if __name__ == "__main__":
-    print("--- init functions and assignment ----")
-    
+
+    print("Test size initialization")
     m = Matrix(2, 3)
     print(m)
     
+    print ("Test list initialization")
+    
+    m_ini = [ [2, 3, 4],
+              [1, 0, 0] ]
+    
+    m = Matrix(m_ini)
+    
+    print(m)
+    
+    print("Test setter")
     m[1, 2] = 1
     print(m)
+    
+    print("Test transpose")
     
     m2 = Matrix(2, 3)
     m2[1, 2] = 3
     print(m2)
     print(m2.transpose())
     
+    print("Test addition and scalar multiplication")
+    print("m + m2*4")
+    
     print(m + m2.scalar(4))
     
-    print("--- mul ----")
+    print("Test multiplication")
     
     m1 = Matrix(2, 3)
     m1[0, 0] = 2
@@ -220,31 +246,35 @@ if __name__ == "__main__":
     m2[2, 1] = 10
     print(m2)
     
+    print("m1 * m2")
+    
     print(m1 * m2)
+    
+    print("m1 and m2")
     
     m1 = [ [1, 2],
            [3, 4] ]
     m1 = Matrix(m1)
     
+    print(m1)
+    
     m2 = [ [0, 1],
            [0, 0] ]
     m2 = Matrix(m2)
     
+    print(m2)
+    
     mres = m1 * m2
     print(mres)
+    
+    print("m1 * m2")
     
     mres = m2 * m1
     print(mres)
     
-    print ("--- list init ---")
+
     
-    m = [ [2, 3, 4],
-          [1, 0, 0] ]
-    
-    mini = Matrix(m)
-    print(mini)
-    
-    print("--- sq matrix ---")
+    print("Test square matrix")
     
     m = [ [1, 1, 1],
           [0, 1, 1],
@@ -253,10 +283,14 @@ if __name__ == "__main__":
     m = SquareMatrix(m)
     
     print(m)
+    print("Is diagonal, is lower, is upper triangular")
     print(m.is_diagonal())
     print(m.is_lower_triangular())    
     print(m.is_upper_triangular()) 
+    
+    print()
 
+    print("Test identity")
     print(m.get_identity())    
     
     

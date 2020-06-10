@@ -62,6 +62,10 @@ class BinaryFile:
         return struct.unpack(dtype, b)[0]
     
     def write_string(self, string):
+        ''' 
+        Writess a string saving the length first and then the caracters
+        encoded with UTF-8
+        '''
         
         self.file.seek(self.co)
         
@@ -81,6 +85,8 @@ class BinaryFile:
         self.co += len(b)
     
     def read_string(self):
+        ''' readst the string from a binary file... in ascii? mmh...
+        '''
         self.file.seek(self.co)
         
         # read the length

@@ -5,9 +5,15 @@ Created on Tue May 22 22:15:01 2018
 @author: Mauro
 """
 
+# =============================================================================
+# Imports
+# =============================================================================
+
+# py imports
 import random
 import copy
 
+# project imports
 import snake
 import poly
 import vec
@@ -18,15 +24,19 @@ import vec
 #==============================================================================
 
 class GameEngine:
+    ''' The class manages the game itself, checks collisions and keeps track
+    of the polygons in game
+    '''
     
+    # collision states
     collision_none = 0
     collision_outbbox = 1
     collision_food = 2
     collision_snake = 3
     
+    # game states
     gamestate_game_over = 0
     gamestate_run = 1
-    
     
     
     def __init__(self):
@@ -53,6 +63,9 @@ class GameEngine:
         self.generate_plist()
     
     def generate_plist(self):
+        ''' Generates the collection of polygons in game, the list will be 
+        used by the graphic engine to render the stuff '''
+        
         # reset the polygon list
         self.p_list = []
         
@@ -67,7 +80,9 @@ class GameEngine:
             self.p_list.append(cube)
     
     def initialize_food(self):
-        # give random coordinates for the food
+        ''' Puts the food in the game, checking if is a valid food position '''
+        
+        # Generates random coordinates for the food
         def generate_rand_point():
             coords = []
             for i in range(4):
@@ -89,9 +104,11 @@ class GameEngine:
     
     
     def intersect(self, point, polygon):
-        # the polygon stores the biggest and smallest vertex in the first 2
-        # elements, is dependent on the create cube function tho, it could be
-        # solved by the max and min functions
+        ''' This function checks for the intersection head of the snake with
+        other polygons.
+        The polygon class stores the biggest and smallest vertex in the first 2
+        elements, this is dependent on the create cube function tho, 
+        but it could be solved by the max and min functions '''
         pbbox_low = polygon.v_list[0]
         pbbox_high = polygon.v_list[1]
         
@@ -101,11 +118,13 @@ class GameEngine:
         return True
     
     def check_collision(self):
+        ''' This function checks if the moved snake hits something '''
+        
         # make the snake move in the next cube
         self.snake.move()
         
         # have to make the bbox bigger by one unit so that the program can 
-        # use the intersect function
+        # use the intersect function to detect a out of box collision
         ext_bbox = copy.deepcopy(self.bbox)
         ext_bbox.v_list[0] = self.bbox.v_list[0] - vec.V4(1,1,1,1)
         ext_bbox.v_list[1] = self.bbox.v_list[1] + vec.V4(1,1,1,1)
@@ -127,6 +146,7 @@ class GameEngine:
         return self.collision_none
     
     def evaluate_collision(self, collision):
+        ''' Decides if the game is over '''
         # decide what to do in case of collision
         
         # out of bounding box or collision with itself will make a game over
@@ -139,21 +159,21 @@ class GameEngine:
             self.score += 1
 
     def routine(self):
-        # the game routine, checks the collision which will "move" the snake
-        # evaluates it and generates the new plist
+        ''' Stuff happening every frame
+        the game routine, checks the collision which will "move" the snake
+        evaluates it and generates the new plist
+        '''
         c = self.check_collision()
         self.evaluate_collision(c)
         self.generate_plist()
         
     def frame_as_bytes(self, bf):
-        
+        ''' Needed to save the replay '''
         bf.write("I", len(self.p_list))
         for p in self.p_list:
             p.as_bytes(bf)
     
-        
-            
-            
+
 if __name__ == "__main__":
     geng = GameEngine()
     geng.routine()

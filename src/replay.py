@@ -12,7 +12,7 @@ Created on Sun May 31 20:53:24 2020
 # py imports
 import os
 from tkinter import (IntVar, StringVar, Toplevel, Checkbutton, Button, 
-                     filedialog)
+                     filedialog, Label)
 
 # project imports
 import bfh
@@ -31,10 +31,9 @@ class ReplaySettings:
     file = "./settings/replay.txt"
     
     def __init__(self):
-        # Default values if the replay setting file doesn't exist
-        self.record = False
+        # Default value if the replay setting file doesn't exist
+        self.record = True
 
-        
         # read the replay setting file
         if os.path.isfile(self.file):
             self.read()
@@ -44,6 +43,7 @@ class ReplaySettings:
         self.recordvar.set(1 if self.record else 0)
 
     def display(self, frame):
+        ''' Displays a checkbox that can be marked for recording '''
         
         # create a top level 
         level = Toplevel(frame)
@@ -51,9 +51,12 @@ class ReplaySettings:
         # create a radio button for the recording
         checkbox = Checkbutton(level, text = "Record", variable = self.recordvar)
         checkbox.pack()
-
-
-    
+        
+        # create a label that shows when the checkbox is updated
+        # display No change if isn't changed
+        # display changed for 1 second if is changed
+        # display no change again?
+        # maybe use a check button?
 
     def read_state(self):
         ''' This function reads the check box and updates the settings 
@@ -86,25 +89,35 @@ class Replay:
     tmp_replay_file = "./settings/_tmp_replay_file.sk4"
     
     def __init__(self, geng):
+        # controls if the users wants to record the replay
         self.replay_settings = ReplaySettings() 
         
+        # the replay loading class
         self.replay = load_replay.LoadReplay()
         
+        # the game engine is needed because the replay polygons can be 
+        # assigned directly to the p_list of the game engine and thus rendered
         self.game = geng
         
+        # state to check if the replay is playing
         self.play_state = False
        
+        # shows the play/pause string
         self.str_play = StringVar()
         
+        # saves the last directory used
         self.previous_save_dir = rem_path.RememberPath("save_dir", "/")
         self.previous_load_dir = rem_path.RememberPath("load_path", "/")
     
-    def elaborate_path(self, path, previous_directory):
-        pos = path.rfind("/")
+    def elaborate_path(self, filename, previous_directory):
+        ''' Function that given a file name splits in path and stores it in
+        the previous path and construct a replay filename'''
         
-        previous_directory.assign(path[ : pos])
+        pos = filename.rfind("/")
         
-        name = path[pos + 1 : ]
+        previous_directory.assign(filename[ : pos])
+        
+        name = filename[pos + 1 : ]
         # check if the extention was added, if it wasnt, add the extention
         if name[::-1][0:4] != ".sk4"[::-1]:
             name += ".sk4"
@@ -118,30 +131,33 @@ class Replay:
         title = "Name a new file"
         extentions = (("snake4d files", ".sk4"),("all files", "*.*"))
         pathname = filedialog.asksaveasfilename(initialdir=initdir,
-                                            title=title,
-                                            filetypes=extentions)
+                                                title=title,
+                                                filetypes=extentions)
         
         if pathname:
-            
             return self.elaborate_path(pathname, self.previous_save_dir)
     
     def select_load_path(self):
         initdir = self.previous_load_dir.get()
-        pathname = filedialog.askopenfilename(initialdir=initdir)
+        title = "Select a replay file"
+        extentions = (("snake4d files", ".sk4"),("all files", "*.*"))
+        pathname = filedialog.askopenfilename(initialdir=initdir,
+                                              title=title,
+                                              filetypes=extentions)
         
         if pathname:
             return self.elaborate_path(pathname, self.previous_load_dir)
 
     
     def reset_replay_file(self):
-        # resets the replay file... it should change because more often than
-        # not overwrites replays
+        # resets the replay file... it should be changed because more often 
+        # than not overwrites replays
         with open(self.tmp_replay_file, "wb") as f:
             f.write(b"")        
     
     def save_replay_frame(self, geng):   
-        # At the update game engine tick this function will append a frame
-        # to the file
+        ''' At the update game engine tick this function will append a frame
+            to the file '''
         if self.replay_settings.record:
             filename = self.tmp_replay_file
             with open(filename, "ab") as fobj:
@@ -152,30 +168,53 @@ class Replay:
         # add a top level to manage the replay
         
         toplevel = Toplevel()
+        toplevel.title("Replay controls")
+        
+        # add the filename as a label
+        filename = filename.replace("\\", "/")
+        pos = filename.rfind("/") + 1
+        name = filename[pos:]
+        
+        filename_label = Label(toplevel, text=name)
+        filename_label.grid(row=0, columnspan=5)
         
         # add buttons allback back play/pause forward allfw
         
         b_allback = Button(toplevel, text="|<", command=self.all_back)
-        b_allback.grid(row=0, column=0)
+        b_allback.grid(row=1, column=0)
         
         b_back = Button(toplevel, text="<", command=self.back)
-        b_back.grid(row=0, column=1)
+        b_back.grid(row=1, column=1)
         
        
         self.str_play.set("pause" if self.play_state else "play")
         
         b_play = Button(toplevel, textvariable=self.str_play, command=self.play)
-        b_play.grid(row=0, column=2)
+        b_play.grid(row=1, column=2)
         
         b_fw = Button(toplevel, text=">", command=self.fw)
-        b_fw.grid(row=0, column=3)
+        b_fw.grid(row=1, column=3)
         
         b_allfw = Button(toplevel, text=">|", command=self.allfw)
-        b_allfw.grid(row=0, column=4)
+        b_allfw.grid(row=1, column=4)
         
-        
+        # load the replay
         self.replay.load_replay_file(filename)
-    
+
+        # add a frame visualizer
+        self.frame_number_var = StringVar()
+        
+        frame_number_label = Label(toplevel, textvariable=self.frame_number_var)
+        frame_number_label.grid(row=2, column=0, columnspan=5)
+        
+        self.update_frame_number()
+
+    def update_frame_number(self):
+       tot_frames = len(self.replay.frames)
+       current_frame = self.replay.current_frame + 1
+       s = f"Frame: {current_frame}/{tot_frames}"
+       self.frame_number_var.set(s)
+
     def tmp_replay_file_is_empty(self):
         with open(self.tmp_replay_file, "rb") as f:
             nbytes = len(f.read())    
@@ -184,6 +223,10 @@ class Replay:
     def set_plist(self, p_list):
         if p_list:
             self.game.p_list = p_list
+            self.update_frame_number()
+            
+    # commands to control the replay
+    # all back, back 1, play/pause, forward 1, all forward
   
     def all_back(self):
         self.replay.current_frame = 0
@@ -191,6 +234,7 @@ class Replay:
         p_list = self.replay.get_frame()
         
         self.set_plist(p_list)
+        self.update_frame_number()
     
     def back(self):
         p_list = self.replay.previous_frame()

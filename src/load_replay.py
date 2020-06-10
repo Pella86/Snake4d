@@ -9,6 +9,7 @@ import bfh
 import poly
 
 def str_file_size(size):
+    ''' Puts the file size in the 1 kb format instead of 1000 b'''
     
     # Size limits in bytes 
     limits = [1, 1e3, 1e6, 1e9, 1e12]
@@ -21,14 +22,17 @@ def str_file_size(size):
     
     # start from the bigger till one finds an appropriate limit
     for limit, letter in sizes:
-        v = size / limit
-        if v >= 1:
-            v = size / limit
+        value = size / limit
+        if value >= 1:
+            value = size / limit
             if letter:
-                return f"{v:.1f} {letter}b"
+                return f"{value:.1f} {letter}b"
             else:
-                v = int(v)
-                return f"{v} b"
+                value = int(value)
+                return f"{value} b"
+    
+    value = int(size)
+    return f"{value} b"
 
 
 class LoadReplay:
@@ -42,6 +46,9 @@ class LoadReplay:
         self.current_frame = 0
         
     def load_replay_file(self, filename):
+        ''' Loads the replay file and appends it to the frames'''
+        self.frames = []
+        
         with open(filename, "rb") as f:
             bf = bfh.BinaryFile(f)
             
@@ -64,11 +71,14 @@ class LoadReplay:
             print("Frames loaded:", len(self.frames))
     
     def next_frame(self):
+        ''' increments the frame and returns the current frame'''
         if self.current_frame + 1 < len(self.frames):
             self.current_frame += 1
-            return self.frames[self.current_frame]
+            return self.get_frame()
     
     def next_frame_wrap(self):
+        ''' Wraps around the end to start back, used in the play/pause 
+        animation'''
         if self.current_frame + 1 < len(self.frames):
             self.current_frame += 1
             return self.get_frame()
@@ -76,9 +86,11 @@ class LoadReplay:
             self.current_frame = 0
             
     def previous_frame(self):
+        ''' decrements the frame and returns the current frame'''
         if self.current_frame - 1 > 0:
             self.current_frame -= 1
-            return self.frames[self.current_frame]        
+            return self.get_frame()    
         
     def get_frame(self):
+        ''' gets the current frame'''
         return self.frames[self.current_frame]

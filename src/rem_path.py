@@ -10,11 +10,18 @@ import os
 
 class RememberPath:
     
+    ''' This class serves as a database for the open/save file path, 
+    it remembers which was the last directory used'''
+    
+    #File where path are stored
     paths_file = "./settings/paths.txt"
-    #paths_file = "./paths.txt"
+    
+    # class attribute dictionary storing the paths
     paths = {}
 
     def __init__(self, name, path):
+        ''' creates a path checking if is already present in the file'''
+        
         # read the file 
         if os.path.isfile(self.paths_file):
             self.read()
@@ -26,7 +33,9 @@ class RememberPath:
         self.name = name
         
     def add_path(self, name, path):
-        # append path and append it to the file, if is not present in the file
+        ''' Append path and append it to the file, if is not present
+        in the file '''
+        
         if self.paths.get(name) == None:
             self.paths[name] = path
             self.write()
@@ -36,6 +45,7 @@ class RememberPath:
     
     
     def assign(self, path):
+        ''' assign a new path to the name, then update the file '''
         self.paths[self.name] = path
         self.write()
     

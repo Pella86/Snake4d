@@ -15,7 +15,7 @@ import copy
 # to do: make segment smaller in the directions orthogonal to the direction
 #        this will make the snake less simmetric
 #        head could be a thetra hedron or half a hypersphere on top of
-#       cylinder
+#        cylinder
 
 class Snake:
     
@@ -31,7 +31,7 @@ class Snake:
         self.p_list = []
         
         for i in range(init_size):
-            next_cube_center = self.head_pos - vec.V4(init_size - i, 0, 0 , 0)
+            next_cube_center = self.head_pos - vec.V4( (init_size - 1) - i, 0, 0 , 0)
             next_cube = self.create_cube(next_cube_center)
             self.p_list.append(next_cube)
         

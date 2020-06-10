@@ -48,8 +48,8 @@ class Cam3:
         # view angle (set to 60 deg by default)
         self.view_angle = math.pi/3
 
-    # calculate the transformation matrix
     def calc_tmatrix(self):
+        ''' calculate the transformation matrix '''
         
         C = self.To - self.From        
         C.normalize()
@@ -63,8 +63,8 @@ class Cam3:
         
         return [A,B,C]
 
-    # project a point
     def prj(self,point):
+        ''' project a point on the 2d screen '''
         
         if point == vec.V3(0, 0, 0): raise CamExcept("Cam3: point is 0")
         
@@ -118,11 +118,11 @@ class Cam4:
         self.Ly = 1.5
         self.Lz = 1.5
         
-        # 4d view angle
+        # 4d view angle (set at 60 deg by default)
         self.view_angle = math.pi/3    
-        
-    # calculates the transformation matrix
+         
     def calc_tmatrix(self):
+        '''calculates the transformation matrix'''
         
         D = self.To - self.From
         D.normalize()
@@ -138,8 +138,8 @@ class Cam4:
 
         return [A,B,C,D]    
  
-    # project the a 4d point into a 3d cube screen
     def prj(self, point):
+        '''project the a 4d point into a 3d cube screen'''
         point = point - self.From
         if point == vec.V4(0, 0, 0, 0): raise CamExcept("Cam4: prj point null vec")
         
