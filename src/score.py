@@ -8,10 +8,17 @@ Created on Fri May 25 22:01:56 2018
 # Imports
 #==============================================================================
 
+# py imports
 import datetime
 from tkinter import Label, Toplevel
+import os
+
+# project imports
 import visu, poly, vec #needed for the graph
 
+# =============================================================================
+# Score data structure
+# =============================================================================
 
 class Score:
     ''' Class representing a score, which is a date and a integer'''
@@ -63,16 +70,18 @@ class Scores:
         
         # reads the file and appends the scores
         self.read_scores()
-    
+
+
     def read_scores(self):
         self.scores = []
         
-        with open(self.filename) as f:
-            lines = f.readlines()
+        if os.path.isfile(self.filename):
+            with open(self.filename, "r") as f:
+                lines = f.readlines()
         
-        for line in lines:
-            s = Score(line)
-            self.scores.append(s)
+            for line in lines:
+                s = Score(line)
+                self.scores.append(s)
     
     def add_score(self, score):
         self.scores.append(score)
@@ -104,7 +113,10 @@ class Scores:
     # gets the last 20 scores in order of time
     def get_last_scores(self):
         return self.sort_by_date(20)
-    
+
+# =============================================================================
+# Class Score Board - GUI    
+# =============================================================================
 
 class ScoreBoard:
     

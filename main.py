@@ -18,7 +18,7 @@ import datetime
 import shutil
 
 # GUI stuff
-from tkinter import (Tk, _tkinter, StringVar, Label, Menu, Toplevel, filedialog,
+from tkinter import (Tk, _tkinter, StringVar, Label, Menu, Toplevel, 
                      messagebox)
 
 # project imports
@@ -28,7 +28,6 @@ import score
 import replay
 import keybuf
 import rate
-import rem_path
 
 
 #==============================================================================
